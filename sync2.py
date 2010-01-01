@@ -14,6 +14,7 @@ class Sync2:
         self.service = suds.client.Client(conf.web_service_url).service
         self.db_conn = MySQLdb.connect(conf.mysql_host, conf.mysql_user, conf.mysql_passwd, conf.mysql_schema, cursorclass=MySQLdb.cursors.DictCursor)
         cursor = self.db_conn.cursor()
+        cursor.execute('set names utf8')
         # TODO:
         cursor.execute('select create_time from class limit 1')
         self.last_sync_time = cursor.fetchone().values()[0]
@@ -25,51 +26,52 @@ class Sync2:
             upload_tables = conf.common_upload_tables + conf.server_upload_tables
         else:
             upload_tables = list(conf.common_upload_tables)
-        for tablename in upload_tables:
-            self.uploadTable(tablename)
+        for table in upload_tables:
+            self.uploadTable(table)
             
         if conf.is_register_server:
             download_tables = conf.common_download_tables + conf.server_download_tables
         else:
             download_tables = list(conf.common_download_tables)
-        for tablename in download_tables:
-            self.downloadTable(tablename)            
+        for table in download_tables:
+            self.downloadTable(table)            
     
-    def uploadTable(self, tableName):
-        datas = self.getAllDataInTable(tableName, "sync is null")
+    def uploadTable(self, table):
+        datas = self.getAllDataInTable(table, "sync is null")
         for data in datas:
-            root = ElementTree.Element('xml_root')
-            e = Element('table')
-            e.text = tableName
-            root.append(e)
-            e = Element('method')
-            e.text = 'upload'
-            root.append(e)
-            e.text = 'upload'
-            data_element = self.dataToXML(data)
-            root.append(data_element)
-            xmlstring = ElementTree.tostring(root)
-            #self.service.uploadXML(xmlstring)
-            
-            if tableName in conf.tables_with_file:
-                self.uploadFile(data['file'])
-            
-            self.setAsSynced(tableName, conf.keys[tableName], data[conf.keys[tableName]])           
+            self.uploadData(table, data)
     
-    def downloadTable(self, tableName):
-        print 'down: ' + tableName
+    def uploadData(self, table, data):
+        """upload a data from table, where data is a dict representing a result from table"""
+        root = ElementTree.Element('xml_root')
+        e = Element('table')
+        e.text = table
+        root.append(e)
+        e = Element('method')
+        e.text = 'upload'
+        root.append(e)
+        e.text = 'upload'
+        data_element = self.dataToXML(data)
+        root.append(data_element)
+        xmlstring = ElementTree.tostring(root, encoding='utf8')
+        #self.service.uploadXML(xmlstring)
+        
+        if table in conf.tables_with_file:
+            self.uploadFile(data['file'])
+        
+        self.setAsSynced(table, conf.keys[table], data[conf.keys[table]])
     
-    def getAllDataInTable(self, tableName, where):
-        """return a dict of the table having the where condition"""
-        cursor = self.db_conn.cursor()
-        cursor.execute('select * from '+tableName)
-        return cursor.fetchall()
+    def downloadTable(self, table):
+        print 'down: ' + table        
         
     def dataToXML(self, data):
         root = ElementTree.Element('data')
         for key, value in data.items():
             e = ElementTree.Element(key)
-            e.text = str(value)
+            if type(value)==str:
+                e.text = value.decode('utf8')
+            else:
+                e.text = unicode(value)
             root.append(e)
         return root
     
@@ -80,12 +82,22 @@ class Sync2:
             #self.service.putFile(filepath, filedata)
         except Exception, e:
             print e
+    
         
-    def setAsSynced(self, tableName, key, value):
-        sql = "update %s set sync = current_timestamp where %s = %s" % (tableName, key, value)
+    # about the database
+    # maybe I should take it out as another class
+    def getAllDataInTable(self, table, where):
+        """return a dict of the table having the where condition"""
+        cursor = self.db_conn.cursor()
+        cursor.execute('select * from '+table)
+        return cursor.fetchall()
+        
+    def setAsSynced(self, table, key, value):
+        sql = "update %s set sync = current_timestamp where %s = %s" % (table, key, value)
         #cursor = self.db_conn.cursor()
         #cursor.execute(sql)
 
 if __name__=='__main__':
     s = Sync2()
-    s.syncAll()
+    s.uploadTable("student_info")
+    #s.syncAll()

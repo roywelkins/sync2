@@ -4,54 +4,6 @@
 <preference-set idref="18a2186f-d6f2-4428-8512-4470f3ec2dc1">
   <boolean id="import_live">1</boolean>
 </preference-set>
-<preference-set idref="18a2186f-d6f2-4428-8512-4470f3ec2dc1/buildexe.py">
-<preference-set id="Invocations">
-<preference-set id="default">
-  <string id="cookieparams"></string>
-  <string id="cwd"></string>
-  <string id="documentRoot"></string>
-  <string id="executable-params"></string>
-  <string relative="path" id="filename">buildexe.py</string>
-  <string id="getparams"></string>
-  <string id="language">Python</string>
-  <string id="mpostparams"></string>
-  <string id="params">py2exe</string>
-  <string id="postparams"></string>
-  <string id="posttype">application/x-www-form-urlencoded</string>
-  <string id="request-method">GET</string>
-  <boolean id="show-dialog">1</boolean>
-  <boolean id="sim-cgi">0</boolean>
-  <boolean id="use-console">0</boolean>
-  <string id="userCGIEnvironment"></string>
-  <string id="userEnvironment"></string>
-</preference-set>
-</preference-set>
-  <string id="lastInvocation">default</string>
-</preference-set>
-<preference-set idref="18a2186f-d6f2-4428-8512-4470f3ec2dc1/pywinservice.py">
-<preference-set id="Invocations">
-<preference-set id="default">
-  <string id="cookieparams"></string>
-  <string id="cwd"></string>
-  <string id="documentRoot"></string>
-  <string id="executable-params"></string>
-  <string relative="path" id="filename">pywinservice.py</string>
-  <string id="getparams"></string>
-  <string id="language">Python</string>
-  <string id="mpostparams"></string>
-  <string id="params"></string>
-  <string id="postparams"></string>
-  <string id="posttype">application/x-www-form-urlencoded</string>
-  <string id="request-method">GET</string>
-  <boolean id="show-dialog">1</boolean>
-  <boolean id="sim-cgi">0</boolean>
-  <boolean id="use-console">1</boolean>
-  <string id="userCGIEnvironment"></string>
-  <string id="userEnvironment"></string>
-</preference-set>
-</preference-set>
-  <string id="lastInvocation">default</string>
-</preference-set>
 <preference-set idref="18a2186f-d6f2-4428-8512-4470f3ec2dc1/sync2.py">
 <preference-set id="Invocations">
 <preference-set id="default">
@@ -70,30 +22,6 @@
   <boolean id="show-dialog">1</boolean>
   <boolean id="sim-cgi">0</boolean>
   <boolean id="use-console">1</boolean>
-  <string id="userCGIEnvironment"></string>
-  <string id="userEnvironment"></string>
-</preference-set>
-</preference-set>
-  <string id="lastInvocation">default</string>
-</preference-set>
-<preference-set idref="18a2186f-d6f2-4428-8512-4470f3ec2dc1/sync2service.py">
-<preference-set id="Invocations">
-<preference-set id="default">
-  <string id="cookieparams"></string>
-  <string id="cwd"></string>
-  <string id="documentRoot"></string>
-  <string id="executable-params"></string>
-  <string relative="path" id="filename">sync2service.py</string>
-  <string id="getparams"></string>
-  <string id="language">Python</string>
-  <string id="mpostparams"></string>
-  <string id="params"></string>
-  <string id="postparams"></string>
-  <string id="posttype">application/x-www-form-urlencoded</string>
-  <string id="request-method">GET</string>
-  <boolean id="show-dialog">1</boolean>
-  <boolean id="sim-cgi">0</boolean>
-  <boolean id="use-console">0</boolean>
   <string id="userCGIEnvironment"></string>
   <string id="userEnvironment"></string>
 </preference-set>
