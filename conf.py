@@ -1,10 +1,9 @@
 # coding:utf8
 
 is_register_server = False # 是否是注册点机器
-
 sync_internal = 1200 # 同步时间间隔
-
 web_service_url = "http://localhost/BV_Upload/BVServicePort?wsdl"
+data_dir_root = "D:\\data\\"
 
 mysql_host = 'localhost'
 mysql_user = 'root'
