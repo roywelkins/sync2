@@ -21,3 +21,4 @@ class Sync2Service(pywinservice.PyWinService):
         
 if __name__=='__main__':
     pywinservice.installAndStartService(Sync2Service)
+

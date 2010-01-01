@@ -1,17 +1,16 @@
 #!/usr/bin/env python
 """The code that do the real things about syncing."""
 
-from suds.client import Client
+import suds
 import conf
 
 class Sync2:
+    _service = suds.client.Client(conf.web_service_url).service
+        
     def syncall(self):
-        print conf.sync_internal
-        pass
-
-#url = 'http://162.105.81.81/BV_Upload/BVServicePort?wsdl'
-#service = Client(url).service
-#service.test_connection("lala")
+        self._service.test_connection("lalala")
+    
+    
 
 if __name__=='__main__':
     s = Sync2()
