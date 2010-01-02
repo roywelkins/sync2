@@ -66,14 +66,11 @@ def installAndStartService(cls):
     win32api.SetConsoleCtrlHandler(lambda x: True, True)
     try:
         module_path = modules[cls.__module__].__file__
-        print module_path
     except AttributeError:
         from sys import executable
         module_path = executable
     module_file = splitext(abspath(module_path))[0]
-    print module_file
     cls._svc_reg_class_ = '%s.%s' % (module_file, cls.__name__)
-    print cls._svc_reg_class_
     # stop and delete service if already exists
     try:
         win32serviceutil.StopService(cls._svc_name_)

@@ -2,6 +2,7 @@
 *.pyo
 .svn/
 build/
+logs/
 dist/
 *.swp
 *~

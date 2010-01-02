@@ -7,8 +7,8 @@ import conf
 class Sync2Db:
     """comunicate with the sql server"""
 
-    def __init__(self):
-        db_conn = MySQLdb.connect(conf.mysql_host, conf.mysql_user, conf.mysql_passwd, conf.mysql_schema, cursorclass=MySQLdb.cursors.DictCursor)
+    def __init__(self, opts):
+        db_conn = MySQLdb.connect(opts['host'], opts['user'], opts['passwd'], opts['schema'], cursorclass=MySQLdb.cursors.DictCursor)
         cursor = db_conn.cursor()
         cursor.execute('set names utf8')
         self.db_conn = db_conn
@@ -16,10 +16,13 @@ class Sync2Db:
     def getLastSyncTime(self):
         return "2009-01-01 01:01:01"
 
-    def getDatas(self, table, where):
+    def getDatas(self, table, where=None):
         """return a dict of the table having the where condition"""
         cursor = self.db_conn.cursor()
-        cursor.execute('select * from '+table)
+        sql = 'select * from '+table
+        if where:
+            sql = sql + ' where '+where
+        cursor.execute(sql)
         return cursor.fetchall()
         
     def setAsSynced(self, table, key, value, synctime):
