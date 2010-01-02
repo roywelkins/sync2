@@ -45,3 +45,17 @@ class Sync2Db:
         except Exception, e:
             print e
 
+    def updateData(self, table, data):
+        key = data[conf.keys[table]]
+        cursor = self.db_conn.cursor()
+        if self.keyAlreadyExists(table, key):
+            self.deleteData(table, key)
+        self.insertData(table, data)
+
+    def deleteData(self, table, key):
+        cursor = self.db_conn.cursor()
+        sql = 'delete from %s where %s = %s' % (table, conf.keys[table], key)
+        cursor.execute(sql)
+
+    def insertData(self, table, data):
+        pass

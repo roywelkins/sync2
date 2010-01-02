@@ -78,6 +78,8 @@ class Sync2:
             data = xmlToData(xmlstring)
             if self.db.alreadyUpToDate(table, data):
                 continue
+            else:
+                self.db.updateData(table, data)
 
     def dataToXML(self, data):
         root = ElementTree.Element('data')
