@@ -17,6 +17,7 @@ datafiles = [
     ('', ['setup.bat', 'uninstall.bat', 'conf.py'])
 ]
 
-setup(service=["sync2service"], options=opts, zipfile="sync2.lib", data_files=datafiles)
+setup(service=["sync2winservice"], options=opts, zipfile="sync2.lib", data_files=datafiles)
 #setup(console=['sync2.py'], options=opts, zipfile="sync2.lib", data_files=datafiles)
+setup(console=['sync2webservice.py'], options=opts, zipfile="sync2.lib", data_files=datafiles)
 #setup(console=['sync2service.py'])
