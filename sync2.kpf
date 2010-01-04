@@ -4,6 +4,54 @@
 <preference-set idref="18a2186f-d6f2-4428-8512-4470f3ec2dc1">
   <boolean id="import_live">1</boolean>
 </preference-set>
+<preference-set idref="18a2186f-d6f2-4428-8512-4470f3ec2dc1/buildexe.py">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <string id="documentRoot"></string>
+  <string id="executable-params"></string>
+  <string relative="path" id="filename">buildexe.py</string>
+  <string id="getparams"></string>
+  <string id="language">Python</string>
+  <string id="mpostparams"></string>
+  <string id="params">py2exe</string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="18a2186f-d6f2-4428-8512-4470f3ec2dc1/serverconf.py">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <string id="documentRoot"></string>
+  <string id="executable-params"></string>
+  <string relative="path" id="filename">serverconf.py</string>
+  <string id="getparams"></string>
+  <string id="language">Python</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
 <preference-set idref="18a2186f-d6f2-4428-8512-4470f3ec2dc1/sync2.py">
 <preference-set id="Invocations">
 <preference-set id="default">
@@ -22,6 +70,102 @@
   <boolean id="show-dialog">1</boolean>
   <boolean id="sim-cgi">0</boolean>
   <boolean id="use-console">1</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="18a2186f-d6f2-4428-8512-4470f3ec2dc1/sync2webservice.py">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <string id="documentRoot"></string>
+  <string id="executable-params"></string>
+  <string relative="path" id="filename">sync2webservice.py</string>
+  <string id="getparams"></string>
+  <string id="language">Python</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">1</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="18a2186f-d6f2-4428-8512-4470f3ec2dc1/sync2winservice.py">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <string id="documentRoot"></string>
+  <string id="executable-params"></string>
+  <string relative="path" id="filename">sync2winservice.py</string>
+  <string id="getparams"></string>
+  <string id="language">Python</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="8eebb072-735c-42c3-ab92-08665e0778ef">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <string id="documentRoot"></string>
+  <string id="executable-params"></string>
+  <string relative="path" id="filename">soaplib/serializers/primitive.py</string>
+  <string id="getparams"></string>
+  <string id="language">Python</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="a156ab42-e1dc-4a67-8935-4be49db9d5a7">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <string id="documentRoot"></string>
+  <string id="executable-params"></string>
+  <string relative="path" id="filename">soaplib/serializers/primitive.py</string>
+  <string id="getparams"></string>
+  <string id="language">Python</string>
+  <string id="mpostparams"></string>
+  <string id="params"></string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">0</boolean>
   <string id="userCGIEnvironment"></string>
   <string id="userEnvironment"></string>
 </preference-set>

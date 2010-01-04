@@ -51,7 +51,7 @@ if __name__=='__main__':
 #    exit()
     try:
         from wsgiref.simple_server import make_server
-        server = make_server('localhost',7789,Sync2WebService())
+        server = make_server('0.0.0.0',7789,Sync2WebService())
         server.serve_forever()
     except KeyboardInterrupt, e:
         print e

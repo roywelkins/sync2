@@ -5,7 +5,8 @@ import os
 is_register_server = False # 是否是注册点机器
 sync_internal = 1200 # 同步时间间隔
 #web_service_url = "http://localhost/BV_Upload/BVServicePort?wsdl"
-web_service_url = "http://localhost:7789/Sync2WebServicewsdl"
+web_service_url = "http://162.105.81.81:7789/Sync2WebServicewsdl"
+#web_service_url = "http://localhost:7789/Sync2WebServicewsdl"
 if os.sep == '/':
     data_dir_root = '/d/data/'
 else:

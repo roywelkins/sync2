@@ -1,5 +1,5 @@
-net stop sync2service
-sync2service -remove
-sync2service -auto -install
-net start sync2service
+net stop sync2winservice
+sync2winservice -remove
+sync2winservice -auto -install
+net start sync2winservice
 pause

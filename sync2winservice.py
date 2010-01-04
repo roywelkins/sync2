@@ -4,7 +4,7 @@ import pywinservice
 import conf
 
 class Sync2Service(pywinservice.PyWinService):
-    _svc_name_ = "sync2service"
+    _svc_name_ = "sync2winservice"
     _svc_display_name_ = _svc_name_
     _svc_discription_ = "Syncer for bioverify system"
     

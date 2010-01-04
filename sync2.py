@@ -19,16 +19,20 @@ class Sync2:
         self.log = Logger('sync2.log.'+time.strftime('%Y%m%d', time.localtime()))
         try:
             self.service = soaplib.client.make_service_client(conf.web_service_url, Sync2WebService())
+            #self.service = Sync2WebService()
+            print 'checking connection with url: ' + conf.web_service_url
             self.next_sync_time = self.service.getCurrentTime()
-        except Exception:
-            pass
+            print 'server time: ' + self.next_sync_time
+            exit()
+        except Exception, e:
+            print e
 #            raise TODO
         try:
             self.db = Sync2Db(conf.mysql_options)
         except Exception, e:
             raise
         # TODO:
-        self.last_sync_time = self.db.getLastSyncTime()
+        self.last_sync_time = self.db.getLastSyncTime()        
         
     def syncAll(self):        
         if conf.is_register_server:
