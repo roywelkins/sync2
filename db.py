@@ -46,7 +46,7 @@ class Db:
         try:
             cursor = self.db_conn.cursor()
             cursor.execute('start transaction')
-            sql = "select %s, sync from %s" % (conf.keys[table], table)        
+            sql = 'select %s, sync from %s where %s="%s"' % (conf.keys[table], table, conf.keys[table], (data[conf.keys[table]]))
             cursor.execute(sql)
             d = cursor.fetchone()
             cursor.execute('commit')
@@ -126,5 +126,5 @@ if __name__=='__main__':
     d = Db(conf.mysql_options)
     d.log = logger.Logger('logs', 'dbtest.txt')
     for data in d.getDatas('student_info', 'sync is null'):
-        data['sync'] = 1
-        d.updateData('student_info', data) 
+        if not d.alreadyUpToDate('student_info', data):
+            print 'shit'
