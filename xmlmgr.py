@@ -18,3 +18,6 @@ class XMLManager:
                     e.text = unicode(value)
                 root.append(e)
         return root
+    
+    def XMLToDict(self, xmlstring, withHead=False):
+        pass

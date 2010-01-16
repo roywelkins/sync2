@@ -31,8 +31,9 @@ class Sync2:
 #            raise TODO
         try:
             self.db = db.Db(conf.mysql_options)
+            self.db.log = self.log
         except Exception, e:
-            raise
+            self.log.write(e)
         # TODO:
         self.last_sync_time = self.db.getLastSyncTime()        
         

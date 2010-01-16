@@ -12,7 +12,7 @@
 
 work items:
 1、和81.81的连接可能性。done
-2、db.updateData，包括检查和各种，2h
+2、db.updateData，2h
 3、db.alreadyUpToDate，数据库检查，1h
 4、xmlToData，需要搜方法，3h
 5、server.upload，依赖4，3，2，2h
@@ -21,3 +21,5 @@ work items:
 8、py2exe用不同的目标目录保存dist，0.5h
 9、如何做test，5h
 10、server.getKeysToSync，2h
+
+Q:既然都采用了soaplib，为什么还用xml来交换数据呢？有attachment方法啊

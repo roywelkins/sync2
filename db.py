@@ -12,6 +12,7 @@ class Db:
         cursor = db_conn.cursor()
         cursor.execute('set names utf8')
         self.db_conn = db_conn
+        self.log = None
         
 
     def getLastSyncTime(self):
@@ -20,26 +21,35 @@ class Db:
     def getDatas(self, table, where=None):
         """return a dict of the table having the where condition"""
         cursor = self.db_conn.cursor()
+        cursor.execute('start transaction')
         sql = 'select * from '+table
         if where:
             sql = sql + ' where '+where
         cursor.execute(sql)
-        return cursor.fetchall()
+        result = cursor.fetchall()
+        cursor.execute('commit')
+        return result
         
     def setAsSynced(self, table, key, value, synctime):
         """set a record as synced at synctime where having key=value(such as uuid=xxxxxxxx)"""
-        sql = "update %s set sync = %s where %s = %s" % (table, synctime, key, value)
-        #cursor = self.db_conn.cursor()
-        #cursor.execute(sql)
+        try:
+            cursor = self.db_conn.cursor()
+            cursor.execute('start transaction')
+            sql = "update %s set sync = %s where %s = '%s'" % (table, synctime, key, value)        
+            cursor.execute(sql)
+            cursor.execute('commit')
+        except Exception, e:
+            self.log.write(e)
 
     def alreadyUpToDate(self, table, data):
         """test if data is up to date"""
-        cursor = self.db_conn.cursor()
-        sql = "select %s, sync from %s" % (conf.keys[table], table)
         try:
-#TODO
-#            cursor.execute(sql)
+            cursor = self.db_conn.cursor()
+            cursor.execute('start transaction')
+            sql = "select %s, sync from %s" % (conf.keys[table], table)        
+            cursor.execute(sql)
             d = cursor.fetchone()
+            cursor.execute('commit')
             if not d:
                 return False
             if d[conf.keys[table]]==data[conf.keys[table]] \
@@ -47,22 +57,74 @@ class Db:
                 return True
             return False
         except Exception, e:
-            if self.logger:
-                self.logger.write(e)
-            else:
-                print e
+            self.log.write(e)
 
     def updateData(self, table, data):
-        key = data[conf.keys[table]]
-        cursor = self.db_conn.cursor()
+        """update table with data
+        
+        if the key of data already exists, delete the old data and insert the new one
+        """
+        key = data[conf.keys[table]]        
         if self.keyAlreadyExists(table, key):
             self.deleteData(table, key)
         self.insertData(table, data)
 
     def deleteData(self, table, key):
-        cursor = self.db_conn.cursor()
-        sql = 'delete from %s where %s = %s' % (table, conf.keys[table], key)
-        cursor.execute(sql)
+        """delete a data from table with key"""
+        try:
+            cursor = self.db_conn.cursor()
+            cursor.execute('start transaction')
+            sql = 'delete from %s where %s = "%s"' % (table, conf.keys[table], key)
+            cursor.execute(sql)
+            cursor.execute('commit')
+        except Exception, e:
+            self.log.write(e)
 
     def insertData(self, table, data):
-        pass
+        """insert a data into table
+        
+        it should not be called directly, instead, use updateData
+        """
+        try:
+            new = {}
+            for item in data.items():
+                if item[1]=='None' or item[1]==None:
+                    pass
+                    #new[item[0]] = 'NULL'
+                elif type(item[1])==str:
+                    new[item[0]] = item[1].decode('utf8')
+                else:
+                    new[item[0]] = unicode(item[1])
+            cursor = self.db_conn.cursor()
+            cursor.execute('start transaction')
+            sql = 'insert into %s (%s) values ("%s")' % (table, ','.join(new.keys()), '","'.join(new.values()))
+            cursor.execute(sql.encode('utf8'))
+            cursor.execute('commit')
+        except Exception, e:
+            self.log.write(e)
+            
+    def keyAlreadyExists(self, table, key):
+        """check if key already exists in table"""
+        try:
+            cursor = self.db_conn.cursor()
+            cursor.execute('start transaction')
+            sql = 'select * from %s where %s = "%s"' % (table, conf.keys[table], key)            
+            cursor.execute(sql)            
+            result = cursor.fetchone()
+            cursor.execute('commit')
+            if result:
+                return True
+            else:
+                return False
+        except Exception, e:
+            self.log.write(e)    
+            
+            
+if __name__=='__main__':
+    import conf
+    import logger
+    d = Db(conf.mysql_options)
+    d.log = logger.Logger('logs', 'dbtest.txt')
+    for data in d.getDatas('student_info', 'sync is null'):
+        data['sync'] = 1
+        d.updateData('student_info', data) 
