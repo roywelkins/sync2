@@ -55,6 +55,8 @@ class Sync2:
     def uploadTable(self, table):
         try:
             datas = self.db.getDatas(table, "sync is null")
+            if not datas:
+                return
             for data in datas:
                 try:
                     synctime = self.uploadData(table, data)
@@ -75,7 +77,7 @@ class Sync2:
         root = self.xmlmgr.dictToXML(datadict, head='root')
         xmlstring = ElementTree.tostring(root, encoding='utf8')
         
-        #self.service.uploadData(xmlstring)
+        self.service.upload(xmlstring)
         
         if table in conf.tables_with_file:
             self.uploadFile(data['file'])
@@ -88,6 +90,8 @@ class Sync2:
                 return
             for key in keys:
                 xmlstring = downloadData(table, key)
+                if not xmlstring:
+                    continue
                 data = xmlToData(xmlstring)
                 if self.db.alreadyUpToDate(table, data):
                     continue
