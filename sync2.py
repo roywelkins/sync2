@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""The code that do the real things about syncing."""
+"""The code that controls the syncer workflow"""
 
 import os
 import traceback
@@ -7,28 +7,30 @@ import time
 import soaplib.client
 from soaplib.serializers.binary import Attachment
 from xml.etree import ElementTree
-from xml.etree.ElementTree import Element
+#from xml.etree.ElementTree import Element
 
 import conf
-from db import Sync2Db
+import db
+import xmlmgr
 from sync2webservice import Sync2WebService
-from logger import Logger
+import logger
 
 class Sync2: 
     def __init__(self):
-        self.log = Logger('sync2.log.'+time.strftime('%Y%m%d', time.localtime()))
+        self.log = logger.Logger(conf.logdir, 'sync2.log.'+time.strftime('%Y%m%d', time.localtime())+'.txt')
+        self.xmlmgr = xmlmgr.XMLManager()
         try:
             self.service = soaplib.client.make_service_client(conf.web_service_url, Sync2WebService())
             #self.service = Sync2WebService()
-            print 'checking connection with url: ' + conf.web_service_url
+            self.log.write('checking connection with url: ' + conf.web_service_url)
             self.next_sync_time = self.service.getCurrentTime()
-            print 'server time: ' + self.next_sync_time
+            self.log.write('server time: ' + self.next_sync_time)
             exit()
         except Exception, e:
-            print e
+            self.log.write(e)
 #            raise TODO
         try:
-            self.db = Sync2Db(conf.mysql_options)
+            self.db = db.Db(conf.mysql_options)
         except Exception, e:
             raise
         # TODO:
@@ -57,51 +59,39 @@ class Sync2:
                     synctime = self.uploadData(table, data)
                     self.db.setAsSynced(table, conf.keys[table], data[conf.keys[table]], synctime)
                 except Exception, e:
-                    print e
+                    self.log.write(e)
         except Exception, e:
             traceback.print_exc(file=self.log.file)
     
     def uploadData(self, table, data):
         """upload a data from table, where data is a dict representing a result from table"""
         # meta info
-        root = ElementTree.Element('xml_root')
-        e = Element('table')
-        e.text = table
-        root.append(e)
-        e = Element('method')
-        e.text = 'upload'
-        root.append(e)
+        datadict = {}
+        datadict['table']=table
+        datadict['method'] = 'upload'
+        datadict['data'] = data
         # data
-        data_element = self.dataToXML(data)
-        root.append(data_element)
+        root = self.xmlmgr.dictToXML(datadict, head='root')
         xmlstring = ElementTree.tostring(root, encoding='utf8')
-        #self.service.uploadXML(xmlstring)
+        
+        #self.service.uploadData(xmlstring)
         
         if table in conf.tables_with_file:
             self.uploadFile(data['file'])
         
     
     def downloadTable(self, table):
-        pass
         keys = self.service.getKeysToBeSync(table, self.last_sync_time, self.next_sync_time)
         for key in keys:
-            xmlstring = downloadData(table, key)            
+            xmlstring = downloadData(table, key)
             data = xmlToData(xmlstring)
             if self.db.alreadyUpToDate(table, data):
                 continue
             else:
                 self.db.updateData(table, data)
-
-    def dataToXML(self, data):
-        root = ElementTree.Element('data')
-        for key, value in data.items():
-            e = ElementTree.Element(key)
-            if type(value)==str:
-                e.text = value.decode('utf8')
-            else:
-                e.text = unicode(value)
-            root.append(e)
-        return root
+            
+            if table in conf.tables_with_file:
+                self.downloadFile(self, data['file'])
     
     def uploadFile(self, filepath):
         try:
@@ -113,16 +103,20 @@ class Sync2:
             filedata = file.read()
             self.service.putFile(filepath, Attachment(data=filedata))
         except Exception, e:
-            print e
+            self.log.write(e)
 
     def downloadFile(self, filepath):
-        try:
+        try:            
             data = self.service.getFile(filepath)
+            if os.sep=='/':
+                filepath = filepath.replace('\\', '/')
+            else:
+                filepath = filepath.replace('/', '\\')
             file = open(os.path.join(conf.data_dir_root, filepath), 'wb')
             file.write(data.data)
             file.close()
         except Exception, e:
-            print e
+            self.log.write(e)
 
     
 if __name__=='__main__':

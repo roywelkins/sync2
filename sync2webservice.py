@@ -43,6 +43,10 @@ class Sync2WebService(SimpleWSGISoapApp):
         data = f.read()
         f.close()
         return Attachment(data=data)
+        
+    def uploadXML(self, xmlstring):
+        print 'not implemented yet'
+        return False
 
 
 if __name__=='__main__':

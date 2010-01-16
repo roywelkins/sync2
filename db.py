@@ -4,7 +4,7 @@ import MySQLdb
 import MySQLdb.cursors
 import conf
 
-class Sync2Db:
+class Db:
     """comunicate with the sql server"""
 
     def __init__(self, opts):
@@ -12,6 +12,7 @@ class Sync2Db:
         cursor = db_conn.cursor()
         cursor.execute('set names utf8')
         self.db_conn = db_conn
+        
 
     def getLastSyncTime(self):
         return "2009-01-01 01:01:01"
@@ -46,7 +47,10 @@ class Sync2Db:
                 return True
             return False
         except Exception, e:
-            print e
+            if self.logger:
+                self.logger.write(e)
+            else:
+                print e
 
     def updateData(self, table, data):
         key = data[conf.keys[table]]
