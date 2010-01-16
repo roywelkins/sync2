@@ -19,9 +19,13 @@ work items:
 4、xmlToData，需要搜方法，3h, done
 5、server.upload，依赖4，3，2，2h, done
 6、server.download，依赖已完成的内容，1h, done
+10、server.getKeysToSync，2h, done, not checked
 7、conf配置剥离到conf.xml，1.5h
 8、py2exe用不同的目标目录保存dist，0.5h
 9、如何做test，5h
-10、server.getKeysToSync，2h
+11、模块结构调整
+12、单立出tableconf
+13、检查代码，异常处理增强
+14、作压缩
 
 Q:既然都采用了soaplib，为什么还用xml来交换数据呢？有attachment方法啊

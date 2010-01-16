@@ -82,17 +82,22 @@ class Sync2:
         
     
     def downloadTable(self, table):
-        keys = self.service.getKeysToBeSync(table, self.last_sync_time, self.next_sync_time)
-        for key in keys:
-            xmlstring = downloadData(table, key)
-            data = xmlToData(xmlstring)
-            if self.db.alreadyUpToDate(table, data):
-                continue
-            else:
-                self.db.updateData(table, data)
-            
-            if table in conf.tables_with_file:
-                self.downloadFile(self, data['file'])
+        try:
+            keys = self.service.getKeysToBeSync(table, self.last_sync_time, self.next_sync_time).split(',')
+            if not keys:
+                return
+            for key in keys:
+                xmlstring = downloadData(table, key)
+                data = xmlToData(xmlstring)
+                if self.db.alreadyUpToDate(table, data):
+                    continue
+                else:
+                    self.db.updateData(table, data)
+                
+                if table in conf.tables_with_file:
+                    self.downloadFile(self, data['file'])
+        except Exception, e:
+            self.log.write(e)
     
     def uploadFile(self, filepath):
         try:

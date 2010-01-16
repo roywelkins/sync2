@@ -28,6 +28,16 @@ class Sync2WebService(SimpleWSGISoapApp):
     @soapmethod(_returns=String)
     def getCurrentTime(self):
         return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    
+    @soapmethod(String, String, String, _returns=String)
+    def getKeysToSync(self, table, lasttime, nexttime):
+        try:
+            if lasttime>=nexttime:
+                return None
+            return self.db.getKeysInTableWithSyncBetween(table, lasttime, nexttime)
+        except Exception, e:
+            self.log.write(e)
+            return None
 
     @soapmethod(String, Attachment)
     def putFile(self, filepath, data):

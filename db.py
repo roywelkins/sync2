@@ -17,6 +17,26 @@ class Db:
 
     def getLastSyncTime(self):
         return "2009-01-01 01:01:01"
+    
+    def getKeysInTableWithSyncBetween(self, table, lasttime, nexttime):
+        """as the name says
+        
+        this method is not check due to database format not done
+        """
+        try:
+            cursor = self.db_conn.cursor()
+            cursor.execute('start transaction')
+            sql = 'select %s from %s where sync between %s and %s limit 500' % (conf.keys[table], table, lasttime, nexttime)
+            cursor.execute(sql)
+            results = cursor.fetchall()
+            cursor.execute('commit')
+            if not results:
+                return None
+            results = [v[0] for v in results]
+            return ','.join(results)                
+        except Exception, e:
+            self.log.write(e)
+            return None        
 
     def getDatas(self, table, where=None):
         """return a dict of the table having the where condition"""
