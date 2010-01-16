@@ -4,9 +4,11 @@
 下载时，下载服务器上sync时间为last_sync_time到next_sync_time之间的内容。
 如果下载的内容有重复，对key和sync进行判断，如果都一致，就跳过。
 
+
 服务器:
-服务器时间以windows或mysql时间为准，只取其中一个，未定
+服务器时间以windows时间为准，未定
 任何表项，只要新插入或者进行了update，sync设为服务器时间
+
 如果上传的内容有重复，判断重复的方法是对除sync外的所有列进行比较。
 
 
@@ -14,9 +16,9 @@ work items:
 1、和81.81的连接可能性。done
 2、db.updateData，done
 3、db.alreadyUpToDate，数据库检查，1h, done,但可能受None，Null之流的影响
-4、xmlToData，需要搜方法，3h
-5、server.upload，依赖4，3，2，2h
-6、server.download，依赖已完成的内容，1h
+4、xmlToData，需要搜方法，3h, done
+5、server.upload，依赖4，3，2，2h, done
+6、server.download，依赖已完成的内容，1h, done
 7、conf配置剥离到conf.xml，1.5h
 8、py2exe用不同的目标目录保存dist，0.5h
 9、如何做test，5h
