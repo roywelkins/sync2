@@ -5,8 +5,9 @@ import os
 is_register_server = False # 是否是注册点机器
 sync_internal = 1200 # 同步时间间隔
 #web_service_url = "http://localhost/BV_Upload/BVServicePort?wsdl"
-web_service_url = "http://162.105.81.81:7789/Sync2WebServicewsdl"
+#web_service_url = "http://162.105.81.81:7789/Sync2WebServicewsdl"
 #web_service_url = "http://localhost:7789/Sync2WebServicewsdl"
+web_service_url = "http://162.105.30.159:7789/Sync2WebServicewsdl"
 if os.sep == '/':
     data_dir_root = '/d/data/'
 else:
@@ -16,7 +17,7 @@ mysql_options = {
         'host':'localhost',
         'user':'root',
         'passwd':'root',
-        'schema':'bioverify',
+        'schema':'bioverify_new',
 }
 
 logdir = 'logs'
@@ -26,10 +27,10 @@ logdir = 'logs'
 common_download_tables = (
     'card_info',
     'class',
-    'result',
+    'result_info',
     'template',
-    'student_info',
-    'student_info_extra',
+    'person_info',
+    'person_extra',
 )
 # 无论注册机还是非注册机都要上传的表
 common_upload_tables = (
@@ -44,8 +45,7 @@ server_upload_tables = (
     'card_info',
     'class',
     'template',
-    'student_info',
-    'student_info_extra',
+    'person_info',
 )
 
 tables_with_file = (
@@ -55,10 +55,11 @@ tables_with_file = (
 
 keys = {    
     'card_info':'card_no',
-    'result':'student_id',
-    'student_info':'student_id',
-    'student_info_extra':'student_id',
+    'result_info':'person_uuid',    
+    'person_extra':'person_uuid',
+    'person_info':'uuid',
     'class':'uuid',
     'sample':'uuid',
     'template':'uuid',
 }
+

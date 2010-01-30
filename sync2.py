@@ -7,6 +7,7 @@ import time
 import soaplib.client
 from soaplib.serializers.binary import Attachment
 from xml.etree import ElementTree
+import socket
 #from xml.etree.ElementTree import Element
 
 import conf
@@ -24,18 +25,20 @@ class Sync2:
             #self.service = Sync2WebService()
             self.log.write('checking connection with url: ' + conf.web_service_url)
             self.next_sync_time = self.service.getCurrentTime()
-            self.log.write('server time: ' + self.next_sync_time)
-            exit()
-        except Exception, e:
-            self.log.write(e)
-#            raise TODO
+            self.log.write('server connected: ' + self.next_sync_time)
+        except socket.error, e:        
+            if e.errno==10061:
+                self.log.write('fatal error: could not connect to server %s ' % conf.web_service_url)
+                raise Exception('fatal error: could not connect to server %s ' % conf.web_service_url)
+            else:
+                self.log.write(e)
+                
         try:
             self.db = db.Db(conf.mysql_options)
             self.db.log = self.log
+            self.last_sync_time = self.db.getLastSyncTime()
         except Exception, e:
-            self.log.write(e)
-        # TODO:
-        self.last_sync_time = self.db.getLastSyncTime()        
+            self.log.write(e)        
         
     def syncAll(self):        
         if conf.is_register_server:
@@ -54,13 +57,14 @@ class Sync2:
     
     def uploadTable(self, table):
         try:
-            datas = self.db.getDatas(table, "sync is null")
+            datas = self.db.getDatas(table, "sync=0")
             if not datas:
                 return
             for data in datas:
                 try:
                     synctime = self.uploadData(table, data)
-                    self.db.setAsSynced(table, conf.keys[table], data[conf.keys[table]], synctime)
+                    if synctime!=None:
+                        self.db.setAsSynced(table, conf.keys[table], data[conf.keys[table]], synctime)
                 except Exception, e:
                     self.log.write(e)
         except Exception, e:
@@ -77,10 +81,12 @@ class Sync2:
         root = self.xmlmgr.dictToXML(datadict, head='root')
         xmlstring = ElementTree.tostring(root, encoding='utf8')
         
-        self.service.upload(xmlstring)
+        synctime = self.service.upload(xmlstring)
         
         if table in conf.tables_with_file:
             self.uploadFile(data['file'])
+            
+        return synctime
         
     
     def downloadTable(self, table):
@@ -131,5 +137,5 @@ class Sync2:
     
 if __name__=='__main__':
     s = Sync2()
-    s.uploadTable('student_info')
+    s.uploadTable('person_info')
     #s.syncAll()

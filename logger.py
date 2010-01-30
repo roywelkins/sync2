@@ -13,7 +13,7 @@ class Logger:
         self.file.close()
         
     def write(self, msg):
-        self.file.write(str(msg))
+        self.file.write(str(msg)+'\n')
         print msg
         
 if __name__=='__main__':

@@ -3,6 +3,7 @@
 上传时只上传sync为null的表项，并且完成后本地该表项的sync时间由服务器返回。
 下载时，下载服务器上sync时间为last_sync_time到next_sync_time之间的内容。
 如果下载的内容有重复，对key和sync进行判断，如果都一致，就跳过。
+对于sample等表的对应关系，有些列是不应该保存的。
 
 
 服务器:

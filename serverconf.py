@@ -9,5 +9,5 @@ mysql_options = {
         'host':'localhost',
         'user':'root',
         'passwd':'root',
-        'schema':'bioverify',
+        'schema':'bioverify_new_server_dev',
 }

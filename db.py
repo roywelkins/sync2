@@ -13,10 +13,26 @@ class Db:
         cursor.execute('set names utf8')
         self.db_conn = db_conn
         self.log = None
+        self.database_id = 1016
         
 
     def getLastSyncTime(self):
-        return "2009-01-01 01:01:01"
+        try:
+            cursor = self.db_conn.cursor()
+            cursor.execute('select last_sync from database_info where database_id = %d' % self.database_id)
+            t = cursor.fetchone()
+            if t==None:
+                self.log.write('%d database does not exist' % self.database_id)
+                raise Exception('fatal error: %d database does not exist' % self.database_id)
+            t = t['last_sync']
+            if t==None:
+                # this is the first time of running sync2
+                import datetime
+                t = datetime.datetime(2000,01,01,01,01,01)
+            return t
+        except Exception, e:
+            sele.log.write(e)
+            return None
     
     def getKeysInTableWithSyncBetween(self, table, lasttime, nexttime):
         """as the name says
@@ -55,7 +71,7 @@ class Db:
         try:
             cursor = self.db_conn.cursor()
             cursor.execute('start transaction')
-            sql = "update %s set sync = %s where %s = '%s'" % (table, synctime, key, value)        
+            sql = "update %s set sync = '%s' where %s = '%s'" % (table, synctime, key, value)        
             cursor.execute(sql)
             cursor.execute('commit')
         except Exception, e:
@@ -108,7 +124,7 @@ class Db:
         try:
             new = {}
             for item in data.items():
-                if item[1]=='None' or item[1]==None:
+                if item[1]=='None' or item[1]==None or item[1]=='NULL' or item[1]=='null':
                     pass
                     #new[item[0]] = 'NULL'
                 elif type(item[1])==str:
@@ -143,8 +159,10 @@ class Db:
 if __name__=='__main__':
     import conf
     import logger
-    d = Db(conf.mysql_options)
+    d = Db(conf.mysql_options)    
     d.log = logger.Logger('logs', 'dbtest.txt')
+    d.getLastSyncTime()
+    exit()
     for data in d.getDatas('student_info', 'sync is null'):
         if not d.alreadyUpToDate('student_info', data):
             print 'shit'

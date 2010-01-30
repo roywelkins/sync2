@@ -15,7 +15,8 @@ import db
 
 class Sync2WebService(SimpleWSGISoapApp):
     
-    def init(self):
+    def __init__(self):
+        SimpleWSGISoapApp.__init__(self)
         self.xmlmgr = xmlmgr.XMLManager()
         self.db = db.Db(serverconf.mysql_options)
         self.log = logger.Logger('logs', 'sync2service.log.'+time.strftime('%Y%m%d', time.localtime())+'.txt')
@@ -78,12 +79,16 @@ class Sync2WebService(SimpleWSGISoapApp):
         currently, we don't check if data is duplicated, i.e., if it is duplicated,
         the old one is deleted.
         """
-        d = self.xmlmgr.XMLToDict(xmlstring)
-        table = d['table']
-        data = table['data']
-        data['sync'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        self.db.updateData(table, data)
-        return data['sync']
+        try:
+            d = self.xmlmgr.XMLToDict(xmlstring)
+            table = d['table']
+            data = d['data']
+            data['sync'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            self.db.updateData(table, data)
+            return data['sync']
+        except Exception, e:
+            self.log.write(e)
+            return None        
         
     @soapmethod(String, String, _returns=String)    
     def download(self, table, key):
@@ -101,6 +106,7 @@ class Sync2WebService(SimpleWSGISoapApp):
             return xs
         except Exception, e:
             self.log.write(e)
+            return None
         
 
 
