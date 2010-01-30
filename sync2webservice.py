@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding:utf8
 
 from soaplib.wsgi_soap import SimpleWSGISoapApp
 from soaplib.service import soapmethod
@@ -12,6 +13,7 @@ import conf
 import logger
 import xmlmgr
 import db
+import exceptions
 
 class Sync2WebService(SimpleWSGISoapApp):
     
@@ -24,6 +26,7 @@ class Sync2WebService(SimpleWSGISoapApp):
         self.xmlmgr = xmlmgr.XMLManager()
         self.db = Sync2WebService.db
         self.log = Sync2WebService.log
+        self.db.reconnect()
 
     @soapmethod(String)
     def test_connection(self, msg):
@@ -31,6 +34,7 @@ class Sync2WebService(SimpleWSGISoapApp):
 
     @soapmethod(_returns=String)
     def getCurrentTime(self):
+        #TODO: 应该在这测试一下是否能连接mysql，不能的话试图重连
         return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     
     @soapmethod(String, String, String, _returns=String)
@@ -41,7 +45,7 @@ class Sync2WebService(SimpleWSGISoapApp):
             return self.db.getKeysInTableWithSyncBetween(table, lasttime, nexttime)
         except Exception, e:
             self.log.write(e)
-            return None
+            raise
 
     @soapmethod(String, Attachment)
     def putFile(self, filepath, data):
@@ -58,6 +62,7 @@ class Sync2WebService(SimpleWSGISoapApp):
             f.close()
         except Exception, e:
             self.log.write(e)
+            raise
 
     @soapmethod(String, _returns=Attachment)
     def getFile(self, filepath):
@@ -71,9 +76,12 @@ class Sync2WebService(SimpleWSGISoapApp):
             data = f.read()
             f.close()
             return Attachment(data=data)
-        except Exception, e:
-            self.log.write(e)
-            return None
+        except exceptions.IOError, e:
+            if e.errno==2:
+                self.log.write('error: no such file: %s' % (filepath, ))
+                return Attachment(data='None')
+            else:
+                raise
         
     @soapmethod(String, _returns=String)    
     def upload(self, xmlstring):
@@ -82,17 +90,13 @@ class Sync2WebService(SimpleWSGISoapApp):
         currently, we don't check if data is duplicated, i.e., if it is duplicated,
         the old one is deleted.
         """
-        try:
-            d = self.xmlmgr.XMLToDict(xmlstring)
-            table = d['table']
-            data = d['data']
-            data['sync'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-            self.db.updateData(table, data)
-            return data['sync']
-        except Exception, e:
-            self.log.write(e)
-            return None        
-        
+        d = self.xmlmgr.XMLToDict(xmlstring)
+        table = d['table']
+        data = d['data']
+        data['sync'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        self.db.updateData(table, data)
+        return data['sync']
+
     @soapmethod(String, String, _returns=String)    
     def download(self, table, key):
         try:
@@ -118,8 +122,12 @@ if __name__=='__main__':
 #    s.putFile('/tmp/1/2', None)
 #    exit()
     try:
-        from wsgiref.simple_server import make_server
-        server = make_server('0.0.0.0',7789,Sync2WebService())
-        server.serve_forever()
+        #from wsgiref.simple_server import make_server
+        #server = make_server('0.0.0.0',7789,Sync2WebService())
+        #server.serve_forever()
+        
+        from cherrypy.wsgiserver import CherryPyWSGIServer
+        server = CherryPyWSGIServer(('0.0.0.0',7789),Sync2WebService())
+        server.start()
     except KeyboardInterrupt, e:
         print e

@@ -26,19 +26,17 @@ class Sync2:
             self.log.write('checking connection with url: ' + conf.web_service_url)
             self.next_sync_time = self.service.getCurrentTime()
             self.log.write('server connected: ' + self.next_sync_time)
-        except socket.error, e:        
-            if e.errno==10061:
-                self.log.write('fatal error: could not connect to server %s ' % conf.web_service_url)
-                raise Exception('fatal error: could not connect to server %s ' % conf.web_service_url)
-            else:
-                self.log.write(e)
+        except socket.error, e:
+            self.log.write('fatal error: could not connect to server %s ' % conf.web_service_url)
+            raise
                 
         try:
             self.db = db.Db(conf.mysql_options)
             self.db.log = self.log
             self.last_sync_time = self.db.getLastSyncTime()
         except Exception, e:
-            self.log.write(e)        
+            self.log.write(e)
+            raise
         
     def syncAll(self):        
         if conf.is_register_server:
@@ -63,12 +61,13 @@ class Sync2:
             for data in datas:
                 try:
                     synctime = self.uploadData(table, data)
-                    if synctime!=None:
-                        self.db.setAsSynced(table, conf.keys[table], data[conf.keys[table]], synctime)
+                    self.db.setAsSynced(table, conf.keys[table], data[conf.keys[table]], synctime)
                 except Exception, e:
                     self.log.write(e)
+                    raise
         except Exception, e:
-            traceback.print_exc(file=self.log.file)
+            self.log.write(e)
+            raise
     
     def uploadData(self, table, data):
         """upload a data from table, where data is a dict representing a result from table"""
@@ -124,6 +123,8 @@ class Sync2:
     def downloadFile(self, filepath):
         try:            
             data = self.service.getFile(filepath)
+            if data.data=='None':
+                return            
             if os.sep=='/':
                 filepath = filepath.replace('\\', '/')
             else:
@@ -133,6 +134,7 @@ class Sync2:
             file.close()
         except Exception, e:
             self.log.write(e)
+            raise
 
     
 if __name__=='__main__':
