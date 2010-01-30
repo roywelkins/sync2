@@ -15,12 +15,15 @@ import db
 
 class Sync2WebService(SimpleWSGISoapApp):
     
+    db = db.Db(serverconf.mysql_options)
+    log = logger.Logger('logs', 'sync2service.log.'+time.strftime('%Y%m%d', time.localtime())+'.txt')
+    db.log = log
+    
     def __init__(self):
         SimpleWSGISoapApp.__init__(self)
         self.xmlmgr = xmlmgr.XMLManager()
-        self.db = db.Db(serverconf.mysql_options)
-        self.log = logger.Logger('logs', 'sync2service.log.'+time.strftime('%Y%m%d', time.localtime())+'.txt')
-        self.db.log = self.log
+        self.db = Sync2WebService.db
+        self.log = Sync2WebService.log
 
     @soapmethod(String)
     def test_connection(self, msg):
