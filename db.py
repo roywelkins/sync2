@@ -34,7 +34,7 @@ class Db:
             # this is the first time of running sync2
             import datetime
             t = datetime.datetime(2000,01,01,01,01,01)
-        return t
+        return t.__str__()
     
     def getKeysInTableWithSyncBetween(self, table, lasttime, nexttime):
         """as the name says
@@ -43,14 +43,12 @@ class Db:
         """
         cursor = self.db_conn.cursor()
         cursor.execute('start transaction')
-        sql = 'select %s from %s where sync between %s and %s limit 500' % (conf.keys[table], table, lasttime, nexttime)
+        sql = 'select %s from %s where sync between "%s" and "%s" limit 500' % (conf.keys[table], table, lasttime, nexttime)
         cursor.execute(sql)
         results = cursor.fetchall()
         cursor.execute('commit')
-        if not results:
-            return None
-        results = [v[0] for v in results]
-        return ','.join(results)                
+        re = [v[conf.keys[table]] for v in results]
+        return re             
   
 
     def getDatas(self, table, where=None):
@@ -77,14 +75,14 @@ class Db:
         """test if data is up to date"""
         cursor = self.db_conn.cursor()
         cursor.execute('start transaction')
-        sql = 'select %s, sync from %s where %s="%s"' % (conf.keys[table], table, conf.keys[table], (data[conf.keys[table]]))
+        sql = 'select %s, sync from %s where %s="%s"' % (conf.keys[table], table, conf.keys[table], data[conf.keys[table]])
         cursor.execute(sql)
         d = cursor.fetchone()
         cursor.execute('commit')
         if not d:
             return False
-        if d[conf.keys[table]]==data[conf.keys[table]] \
-                and d['sync']==data['sync']:
+        sync = d['sync'].__str__()
+        if sync==data['sync']:
             return True
         return False
 

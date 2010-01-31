@@ -21,8 +21,8 @@ class Sync2:
         self.log = logger.Logger(conf.logdir, 'sync2.log.'+time.strftime('%Y%m%d', time.localtime())+'.txt')
         self.xmlmgr = xmlmgr.XMLManager()
         try:
-            self.service = soaplib.client.make_service_client(conf.web_service_url, Sync2WebService())
-            #self.service = Sync2WebService()
+            #self.service = soaplib.client.make_service_client(conf.web_service_url, Sync2WebService())
+            self.service = Sync2WebService()
             self.log.write('checking connection with url: ' + conf.web_service_url)
             self.next_sync_time = self.service.getCurrentTime()
             self.log.write('server connected: ' + self.next_sync_time)
@@ -90,14 +90,15 @@ class Sync2:
     
     def downloadTable(self, table):
         try:
-            keys = self.service.getKeysToBeSync(table, self.last_sync_time, self.next_sync_time).split(',')
+            keys = self.service.getKeysToSync(table, self.last_sync_time, self.next_sync_time).split(',')
             if not keys:
                 return
             for key in keys:
-                xmlstring = downloadData(table, key)
+                xmlstring = self.downloadData(table, key)
                 if not xmlstring:
                     continue
-                data = xmlToData(xmlstring)
+                data = self.xmlmgr.XMLToDict(xmlstring)
+                data = data['data']
                 if self.db.alreadyUpToDate(table, data):
                     continue
                 else:
@@ -107,6 +108,17 @@ class Sync2:
                     self.downloadFile(self, data['file'])
         except Exception, e:
             self.log.write(e)
+            raise
+            
+    def downloadData(self, table, key):
+        """download a data from the web service"""
+        xmlstring = self.service.download(table, key)
+        if xmlstring=='':
+            return None
+        else:
+            if type(xmlstring)==str:
+                xmlstring = xmlstring.decode('utf8')
+            return xmlstring
     
     def uploadFile(self, filepath):
         try:
@@ -139,5 +151,5 @@ class Sync2:
     
 if __name__=='__main__':
     s = Sync2()
-    s.uploadTable('person_info')
+    s.downloadTable('person_info')
     #s.syncAll()

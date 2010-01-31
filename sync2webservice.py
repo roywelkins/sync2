@@ -14,6 +14,7 @@ import logger
 import xmlmgr
 import db
 import exceptions
+from xml.etree import cElementTree as ElementTree
 
 class Sync2WebService(SimpleWSGISoapApp):
     
@@ -41,8 +42,12 @@ class Sync2WebService(SimpleWSGISoapApp):
     def getKeysToSync(self, table, lasttime, nexttime):
         try:
             if lasttime>=nexttime:
-                return None
-            return self.db.getKeysInTableWithSyncBetween(table, lasttime, nexttime)
+                return ''
+            re = self.db.getKeysInTableWithSyncBetween(table, lasttime, nexttime)
+            if not re:
+                return ''
+            else:
+                return ','.join(re)
         except Exception, e:
             self.log.write(e)
             raise
@@ -100,7 +105,7 @@ class Sync2WebService(SimpleWSGISoapApp):
     @soapmethod(String, String, _returns=String)    
     def download(self, table, key):
         try:
-            datas = d.getDatas(table, '%s = "%s" limit 1' % (conf.keys[table], key))
+            datas = self.db.getDatas(table, '%s = "%s" limit 1' % (conf.keys[table], key))
             if not datas:
                 return None
             data = datas[0]
@@ -108,12 +113,12 @@ class Sync2WebService(SimpleWSGISoapApp):
             datadict['table']=table
             datadict['method'] = 'download'
             datadict['data'] = data
-            xe = x.dictToXML(datadict,'root')
+            xe = self.xmlmgr.dictToXML(datadict,'root')
             xs = ElementTree.tostring(xe, encoding='utf8')
             return xs
         except Exception, e:
             self.log.write(e)
-            return None
+            raise
         
 
 
