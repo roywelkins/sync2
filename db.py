@@ -112,7 +112,9 @@ class Db:
         """
         new = {}
         for item in data.items():
-            if item[1]=='None' or item[1]==None or item[1]=='NULL' or item[1]=='null':
+            if item[0] in conf.filed_exclude[table]:
+                pass
+            elif item[1]=='None' or item[1]==None or item[1]=='NULL' or item[1]=='null':
                 pass
                 #new[item[0]] = 'NULL'
             elif type(item[1])==str:
@@ -137,6 +139,12 @@ class Db:
             return True
         else:
             return False
+        
+    def executeSQL(self, sql):
+        cursor = self.db_conn.cursor()
+        cursor.execute('start transaction')
+        cursor.execute(sql)
+        cursor.execute('commit')
             
             
 if __name__=='__main__':

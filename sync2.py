@@ -11,10 +11,12 @@ import socket
 #from xml.etree.ElementTree import Element
 
 import conf
+import plugin
 import db
 import xmlmgr
 from sync2webservice import Sync2WebService
 import logger
+import exceptions
 
 class Sync2: 
     def __init__(self):
@@ -55,6 +57,11 @@ class Sync2:
     
     def uploadTable(self, table):
         try:
+            try:
+                plug = conf.plugins[table](self.db)
+            except exceptions.KeyError, e:
+                plug = plugin.PluginAbstract()
+            plug.preUpload()
             datas = self.db.getDatas(table, "sync=0")
             if not datas:
                 return
@@ -65,6 +72,7 @@ class Sync2:
                 except Exception, e:
                     self.log.write(e)
                     raise
+            plug.postUpload()
         except Exception, e:
             self.log.write(e)
             raise
@@ -90,6 +98,11 @@ class Sync2:
     
     def downloadTable(self, table):
         try:
+            try:
+                plug = conf.plugins[table](self.db)
+            except exceptions.KeyError, e:
+                plug = plugin.PluginAbstract()
+            plug.preDownload()
             keys = self.service.getKeysToSync(table, self.last_sync_time, self.next_sync_time).split(',')
             if not keys:
                 return
@@ -106,6 +119,8 @@ class Sync2:
                 
                 if table in conf.tables_with_file:
                     self.downloadFile(self, data['file'])
+            
+            plug.postDownload()
         except Exception, e:
             self.log.write(e)
             raise
@@ -151,5 +166,5 @@ class Sync2:
     
 if __name__=='__main__':
     s = Sync2()
-    s.downloadTable('person_info')
+    s.downloadTable('card_info')
     #s.syncAll()
