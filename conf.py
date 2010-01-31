@@ -63,12 +63,18 @@ keys = {
     'template':'uuid',
 }
 
-filed_exclude = {
+field_exclude = {
     #'person_info':('person_id',), 没有处理这个会有潜在的bug风险
     'card_info':('person_id','person_uuid'),
+    'class':('person_id','class_id'),
+    'sample':('person_id','class_id', 'sample_id'),
 }
 
 import plugin
 plugins = {
     'card_info':plugin.CardInfoPlugin,
+    'class':plugin.ClassPlugin,
+    'sample':plugin.SamplePlugin,
+    'template':plugin.TemplatePlugin,
 }
+

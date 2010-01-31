@@ -112,7 +112,7 @@ class Db:
         """
         new = {}
         for item in data.items():
-            if item[0] in conf.filed_exclude[table]:
+            if table in conf.field_exclude.keys() and item[0] in conf.field_exclude[table]:
                 pass
             elif item[1]=='None' or item[1]==None or item[1]=='NULL' or item[1]=='null':
                 pass
@@ -120,7 +120,10 @@ class Db:
             elif type(item[1])==str:
                 new[item[0]] = item[1].decode('utf8')
             else:
-                new[item[0]] = unicode(item[1])
+                new[item[0]] = unicode(item[1])            
+            if item[0]=='file':
+                new[item[0]] = new[item[0]].replace('\\', '\\\\')
+                
         cursor = self.db_conn.cursor()
         cursor.execute('start transaction')
         sql = 'insert into %s (%s) values ("%s")' % (table, ','.join(new.keys()), '","'.join(new.values()))

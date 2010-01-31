@@ -16,3 +16,19 @@ cur = conn.cursor()
 #cur.execute('delete from card_info where card_no like "%.0"')
 #cur.execute('commit')
 
+#class
+#cur.execute('delete from class')
+#cur.execute('insert into class (uuid,person_id,person_uuid,database_id,create_time,type,subtype) select bioverify.class.uuid,person_id,person_info.uuid,1016,bioverify.class.create_time,1,type from bioverify.class left join person_info on bioverify.class.student_id=person_info.student_id')
+#cur.execute('delete from class where person_id is null)
+#cur.execute('commit')
+
+#sample
+cur.execute('delete from sample')
+cur.execute('insert into sample (uuid,person_id,person_uuid,database_id,create_time,file,class_uuid,class_id) \
+            select bioverify.sample.uuid,person_info.person_id,person_info.uuid,\
+            1016,bioverify.sample.create_time,bioverify.sample.file,bioverify.sample.class_uuid,class.class_id from \
+            bioverify.sample left join person_info on bioverify.sample.student_id = person_info.student_id \
+            left join class on class.uuid=bioverify.sample.class_uuid \
+')
+cur.execute('delete from sample where class_id is null')
+cur.execute('commit')

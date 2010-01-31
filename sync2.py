@@ -118,7 +118,7 @@ class Sync2:
                     self.db.updateData(table, data)
                 
                 if table in conf.tables_with_file:
-                    self.downloadFile(self, data['file'])
+                    self.downloadFile(data['file'])
             
             plug.postDownload()
         except Exception, e:
@@ -144,11 +144,11 @@ class Sync2:
             file = open(os.path.join(conf.data_dir_root, filepath), 'rb')
             filedata = file.read()
             self.service.putFile(filepath, Attachment(data=filedata))
-        except Exception, e:
-            self.log.write(e)
+        except exceptions.IOError, e:
+            self.log.write(e)            
 
     def downloadFile(self, filepath):
-        try:            
+        try:
             data = self.service.getFile(filepath)
             if data.data=='None':
                 return            
@@ -156,7 +156,10 @@ class Sync2:
                 filepath = filepath.replace('\\', '/')
             else:
                 filepath = filepath.replace('/', '\\')
-            file = open(os.path.join(conf.data_dir_root, filepath), 'wb')
+            fullpath = os.path.join(conf.data_dir_root, filepath)
+            if not os.path.isdir(os.path.dirname(fullpath)):
+                os.makedirs(os.path.dirname(fullpath))
+            file = open(fullpath, 'wb')
             file.write(data.data)
             file.close()
         except Exception, e:
@@ -166,5 +169,5 @@ class Sync2:
     
 if __name__=='__main__':
     s = Sync2()
-    s.downloadTable('card_info')
+    s.uploadTable('sample')
     #s.syncAll()
