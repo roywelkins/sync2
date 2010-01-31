@@ -169,5 +169,5 @@ class Sync2:
     
 if __name__=='__main__':
     s = Sync2()
-    s.uploadTable('sample')
+    s.uploadTable('template')
     #s.syncAll()

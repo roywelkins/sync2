@@ -61,13 +61,17 @@ keys = {
     'class':'uuid',
     'sample':'uuid',
     'template':'uuid',
+    'record':'uuid',
 }
 
 field_exclude = {
-    #'person_info':('person_id',), 没有处理这个会有潜在的bug风险
+    'person_info':('person_id',), #没有处理这个会有潜在的bug风险
     'card_info':('person_id','person_uuid'),
     'class':('person_id','class_id'),
     'sample':('person_id','class_id', 'sample_id'),
+    'template':('person_id','class_id', 'sample_id', 'template_id'),
+    'result_info':('person_id',),
+    'record':('person_id','class_id','sample_id','record_id'),
 }
 
 import plugin
@@ -77,4 +81,3 @@ plugins = {
     'sample':plugin.SamplePlugin,
     'template':plugin.TemplatePlugin,
 }
-

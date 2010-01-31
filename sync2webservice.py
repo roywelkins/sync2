@@ -123,17 +123,17 @@ class Sync2WebService(SimpleWSGISoapApp):
     @soapmethod()
     def fixAll(self):
         #card_info
-        self.db.executeSQL('update card_info set person_id = (select person_id from person_info where person_info.student_id = card_info.student_id)')
-        self.db.executeSQL('update card_info set person_uuid = (select uuid from person_info where person_info.student_id = card_info.student_id)')
+        self.db.executeSQL('update card_info set person_id = (select person_id from person_info where person_info.student_id = card_info.student_id) where person_id is null')
+        self.db.executeSQL('update card_info set person_uuid = (select uuid from person_info where person_info.student_id = card_info.student_id) where person_uuid is null')
         #class
-        self.db.executeSQL('update class set person_id = (select person_id from person_info where person_info.uuid = class.person_uuid)')
+        self.db.executeSQL('update class set person_id = (select person_id from person_info where person_info.uuid = class.person_uuid) where person_id is null')
         #sample
-        self.db.executeSQL('update sample set person_id = (select person_id from person_info where person_info.uuid = sample.person_uuid)')
-        self.db.executeSQL('update sample set class_id = (select class_id from class where class.uuid = sample.class_uuid)')
+        self.db.executeSQL('update sample set person_id = (select person_id from person_info where person_info.uuid = sample.person_uuid) where person_id is null')
+        self.db.executeSQL('update sample set class_id = (select class_id from class where class.uuid = sample.class_uuid) where class_id is null')
         #template
-        self.db.executeSQL('update sample set person_id = (select person_id from person_info where person_info.uuid = sample.person_uuid)')
-        self.db.executeSQL('update template set class_id = (select class_id from class where class.uuid = template.class_uuid)')
-        self.db.executeSQL('update template set sample_id = (select sample_id from sample where sample.uuid = template.sample_uuid)')
+        self.db.executeSQL('update template set person_id = (select person_id from person_info where person_info.uuid = template.person_uuid) where person_id is null')
+        self.db.executeSQL('update template set class_id = (select class_id from class where class.uuid = template.class_uuid) where class_id is null')
+        self.db.executeSQL('update template set sample_id = (select sample_id from sample where sample.uuid = template.sample_uuid) where sample_id is null')
         
 
 
@@ -141,9 +141,9 @@ if __name__=='__main__':
 #    s = Sync2WebService()
 #    s.putFile('/tmp/1/2', None)
 #    exit()
-    s = Sync2WebService()
-    s.fixAll()
-    exit()
+    #s = Sync2WebService()
+    #s.fixAll()
+    #exit()
     try:
         #from wsgiref.simple_server import make_server
         #server = make_server('0.0.0.0',7789,Sync2WebService())
