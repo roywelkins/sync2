@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<conf>
+    <data_dir_root_windows>D:\\data_server\\</data_dir_root_windows>
+    <data_dir_root_linux>/d/data_server/</data_dir_root_linux>
+    <mysql_options>
+        <host>localhost</host>
+        <user>root</user>
+        <passwd>root</passwd>
+        <schema>bioverify_new_server_dev</schema>
+    </mysql_options>
+</conf>
+
+

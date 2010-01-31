@@ -23,8 +23,8 @@ class Sync2:
         self.log = logger.Logger(conf.logdir, 'sync2.log.'+time.strftime('%Y%m%d', time.localtime())+'.txt')
         self.xmlmgr = xmlmgr.XMLManager()
         try:
-            #self.service = soaplib.client.make_service_client(conf.web_service_url, Sync2WebService())
-            self.service = Sync2WebService()
+            self.service = soaplib.client.make_service_client(conf.web_service_url, Sync2WebService())
+            #self.service = Sync2WebService()
             self.log.write('checking connection with url: ' + conf.web_service_url)
             self.next_sync_time = self.service.getCurrentTime()
             self.log.write('server connected: ' + self.next_sync_time)

@@ -16,10 +16,14 @@ opts = {
 
 datafiles = [
     ('', ['setup.bat', 'uninstall.bat',
-          #'conf.py', 'serverconf.py'
+          'conf.xml',
           ])
+]
+
+datafiles_server = [
+    ('', ['serverconf.xml',])
 ]
 
 #setup(service=["sync2winservice"], options=opts, zipfile="sync2.lib", data_files=datafiles)
 #setup(console=['sync2.py'], options=opts, zipfile="sync2.lib", data_files=datafiles)
-setup(console=['sync2webservice.py'], options=opts, zipfile="sync2.lib", data_files=datafiles)
+setup(console=['sync2webservice.py'], options=opts, zipfile="sync2.lib", data_files=datafiles_server)
