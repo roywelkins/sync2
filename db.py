@@ -3,7 +3,7 @@
 
 import MySQLdb
 import MySQLdb.cursors
-import conf
+import baseconf as conf
 
 class Db:
     """comunicate with the sql server"""
@@ -26,6 +26,7 @@ class Db:
         cursor = self.db_conn.cursor()
         cursor.execute('select last_sync from database_info where database_id = %d' % self.database_id)
         t = cursor.fetchone()
+        cursor.execute('commit')
         if t==None:
             self.log.write('%d database does not exist' % self.database_id)
             raise Exception('fatal error: %d database does not exist' % self.database_id)
@@ -35,6 +36,11 @@ class Db:
             import datetime
             t = datetime.datetime(2000,01,01,01,01,01)
         return t.__str__()
+        
+    def setLastSyncTime(self, synctime):
+        cursor = self.db_conn.cursor()
+        cursor.execute('update database_info set last_sync="%s" where database_id = %d' % (synctime, self.database_id))
+        cursor.execute('commit')
     
     def getKeysInTableWithSyncBetween(self, table, lasttime, nexttime):
         """as the name says
@@ -156,6 +162,7 @@ if __name__=='__main__':
     d = Db(conf.mysql_options)    
     d.log = logger.Logger('logs', 'dbtest.txt')
     d.getLastSyncTime()
+    d.setLastSyncTime('2009-01-09 01:01:01')
     exit()
     for data in d.getDatas('student_info', 'sync is null'):
         if not d.alreadyUpToDate('student_info', data):

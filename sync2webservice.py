@@ -9,7 +9,6 @@ from soaplib.serializers.binary import Attachment
 import os
 import time
 import serverconf
-import conf
 import logger
 import xmlmgr
 import db

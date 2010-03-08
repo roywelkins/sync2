@@ -44,19 +44,22 @@ class Sync2:
         if conf.is_register_server:
             upload_tables = conf.common_upload_tables + conf.server_upload_tables
         else:
-            upload_tables = list(conf.common_upload_tables)
+            upload_tables = conf.common_upload_tables
         for table in upload_tables:
             self.uploadTable(table)
             
         if conf.is_register_server:
             download_tables = conf.common_download_tables + conf.server_download_tables
         else:
-            download_tables = list(conf.common_download_tables)
+            download_tables = conf.common_download_tables
         for table in download_tables:
-            self.downloadTable(table)            
+            self.downloadTable(table)
+            
+        self.db.setLastSyncTime(self.next_sync_time)
     
     def uploadTable(self, table):
         try:
+            self.log.write('upload: %s' % (table,))
             try:
                 plug = conf.plugins[table](self.db)
             except exceptions.KeyError, e:
@@ -67,15 +70,14 @@ class Sync2:
                 return
             for data in datas:
                 try:
-                    synctime = self.uploadData(table, data)
-                    self.db.setAsSynced(table, conf.keys[table], data[conf.keys[table]], synctime)
+                    self.uploadData(table,data)
                 except Exception, e:
                     self.log.write(e)
                     raise
             plug.postUpload()
         except Exception, e:
             self.log.write(e)
-            raise
+            raise        
     
     def uploadData(self, table, data):
         """upload a data from table, where data is a dict representing a result from table"""
@@ -92,12 +94,13 @@ class Sync2:
         
         if table in conf.tables_with_file:
             self.uploadFile(data['file'])
-            
-        return synctime
+        
+        self.db.setAsSynced(table, conf.keys[table], data[conf.keys[table]], synctime)    
         
     
     def downloadTable(self, table):
         try:
+            self.log.write('download: %s' % (table,))
             try:
                 plug = conf.plugins[table](self.db)
             except exceptions.KeyError, e:
@@ -169,5 +172,6 @@ class Sync2:
     
 if __name__=='__main__':
     s = Sync2()
-    s.uploadTable('template')
-    #s.syncAll()
+    #s.uploadTable('person_info')
+    #s.downloadTable('person_info')    
+    s.syncAll()
