@@ -26,6 +26,7 @@ class Sync2:
             self.service = soaplib.client.make_service_client(conf.web_service_url, Sync2WebService())
             #self.service = Sync2WebService()
             self.log.write('checking connection with url: ' + conf.web_service_url)
+            self.service.test_connection('aa')
             self.next_sync_time = self.service.getCurrentTime()
             self.log.write('server connected: ' + self.next_sync_time)
         except socket.error, e:
@@ -40,7 +41,7 @@ class Sync2:
             self.log.write(e)
             raise
         
-    def syncAll(self):        
+    def syncAll(self):
         if conf.is_register_server:
             upload_tables = conf.common_upload_tables + conf.server_upload_tables
         else:
@@ -54,7 +55,8 @@ class Sync2:
             download_tables = conf.common_download_tables
         for table in download_tables:
             self.downloadTable(table)
-            
+        
+        self.service.fixAll()
         self.db.setLastSyncTime(self.next_sync_time)
     
     def uploadTable(self, table):
@@ -106,9 +108,10 @@ class Sync2:
             except exceptions.KeyError, e:
                 plug = plugin.PluginAbstract()
             plug.preDownload()
-            keys = self.service.getKeysToSync(table, self.last_sync_time, self.next_sync_time).split(',')
-            if not keys:
+            keytosync = self.service.getKeysToSync(table, self.last_sync_time, self.next_sync_time)
+            if not keytosync:
                 return
+            keys = keytosync.split(',')
             for key in keys:
                 xmlstring = self.downloadData(table, key)
                 if not xmlstring:
@@ -121,8 +124,7 @@ class Sync2:
                     self.db.updateData(table, data)
                 
                 if table in conf.tables_with_file:
-                    self.downloadFile(data['file'])
-            
+                    self.downloadFile(data['file'])            
             plug.postDownload()
         except Exception, e:
             self.log.write(e)
@@ -171,7 +173,14 @@ class Sync2:
 
     
 if __name__=='__main__':
-    s = Sync2()
-    #s.uploadTable('person_info')
-    #s.downloadTable('person_info')    
-    s.syncAll()
+    while(True):
+        try:
+            #sleep(conf.sync_internal*1000/2)
+            s = Sync2()
+            #s.uploadTable('person_info')
+            #s.downloadTable('person_info')    
+            s.syncAll()
+            sleep(conf.sync_internal*1000/2)
+        except Exception, e:
+            f = open('sync2error.txt', 'a')
+            print >> f, e

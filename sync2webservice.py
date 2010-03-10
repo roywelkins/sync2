@@ -9,6 +9,7 @@ from soaplib.serializers.binary import Attachment
 import os
 import time
 import serverconf
+import baseconf
 import logger
 import xmlmgr
 import db
@@ -17,20 +18,21 @@ from xml.etree import cElementTree as ElementTree
 
 class Sync2WebService(SimpleWSGISoapApp):
     
-    db = db.Db(serverconf.mysql_options)
     log = logger.Logger('logs', 'sync2service.log.'+time.strftime('%Y%m%d', time.localtime())+'.txt')
-    db.log = log
+    
+    def getNewDb(self):
+        d = db.Db(serverconf.mysql_options)        
+        d.log = Sync2WebService.log
+        return d
     
     def __init__(self):
         SimpleWSGISoapApp.__init__(self)
         self.xmlmgr = xmlmgr.XMLManager()
-        self.db = Sync2WebService.db
         self.log = Sync2WebService.log
-        self.db.reconnect()
 
     @soapmethod(String)
     def test_connection(self, msg):
-        print msg
+        self.log.write(msg)
 
     @soapmethod(_returns=String)
     def getCurrentTime(self):
@@ -42,7 +44,7 @@ class Sync2WebService(SimpleWSGISoapApp):
         try:
             if lasttime>=nexttime:
                 return ''
-            re = self.db.getKeysInTableWithSyncBetween(table, lasttime, nexttime)
+            re = self.getNewDb().getKeysInTableWithSyncBetween(table, lasttime, nexttime)
             if not re:
                 return ''
             else:
@@ -98,13 +100,13 @@ class Sync2WebService(SimpleWSGISoapApp):
         table = d['table']
         data = d['data']
         data['sync'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        self.db.updateData(table, data)
+        self.getNewDb().updateData(table, data)
         return data['sync']
 
     @soapmethod(String, String, _returns=String)    
     def download(self, table, key):
         try:
-            datas = self.db.getDatas(table, '%s = "%s" limit 1' % (conf.keys[table], key))
+            datas = self.getNewDb().getDatas(table, '%s = "%s" limit 1' % (baseconf.keys[table], key))
             if not datas:
                 return None
             data = datas[0]
@@ -122,17 +124,21 @@ class Sync2WebService(SimpleWSGISoapApp):
     @soapmethod()
     def fixAll(self):
         #card_info
-        self.db.executeSQL('update card_info set person_id = (select person_id from person_info where person_info.student_id = card_info.student_id) where person_id is null')
-        self.db.executeSQL('update card_info set person_uuid = (select uuid from person_info where person_info.student_id = card_info.student_id) where person_uuid is null')
+        d = self.getNewDb()
+        d.executeSQL('update card_info set person_id = (select person_id from person_info where person_info.student_id = card_info.student_id) where person_id is null')
+        db.executeSQL('update card_info set person_uuid = (select uuid from person_info where person_info.student_id = card_info.student_id) where person_uuid is null')
         #class
-        self.db.executeSQL('update class set person_id = (select person_id from person_info where person_info.uuid = class.person_uuid) where person_id is null')
+        db.executeSQL('update class set person_id = (select person_id from person_info where person_info.uuid = class.person_uuid) where person_id is null')
         #sample
-        self.db.executeSQL('update sample set person_id = (select person_id from person_info where person_info.uuid = sample.person_uuid) where person_id is null')
-        self.db.executeSQL('update sample set class_id = (select class_id from class where class.uuid = sample.class_uuid) where class_id is null')
+        db.executeSQL('update sample set person_id = (select person_id from person_info where person_info.uuid = sample.person_uuid) where person_id is null')
+        db.executeSQL('update sample set class_id = (select class_id from class where class.uuid = sample.class_uuid) where class_id is null')
         #template
-        self.db.executeSQL('update template set person_id = (select person_id from person_info where person_info.uuid = template.person_uuid) where person_id is null')
-        self.db.executeSQL('update template set class_id = (select class_id from class where class.uuid = template.class_uuid) where class_id is null')
-        self.db.executeSQL('update template set sample_id = (select sample_id from sample where sample.uuid = template.sample_uuid) where sample_id is null')
+        db.executeSQL('update template set person_id = (select person_id from person_info where person_info.uuid = template.person_uuid) where person_id is null')
+        db.executeSQL('update template set class_id = (select class_id from class where class.uuid = template.class_uuid) where class_id is null')
+        db.executeSQL('update template set sample_id = (select sample_id from sample where sample.uuid = template.sample_uuid) where sample_id is null')
+        
+        db.recordDeduplicate()
+        db.genResult()
         
 
 

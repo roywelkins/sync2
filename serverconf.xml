@@ -6,7 +6,7 @@
         <host>localhost</host>
         <user>root</user>
         <passwd>root</passwd>
-        <schema>bioverify_new_server_dev</schema>
+        <schema>bioverify_new</schema>
     </mysql_options>
 </conf>
 

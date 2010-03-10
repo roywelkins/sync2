@@ -20,5 +20,6 @@ class Sync2Service(pywinservice.PyWinService):
         self.runflag = False
         
 if __name__=='__main__':
-    pywinservice.installAndStartService(Sync2Service)
-
+    #pywinservice.installAndStartService(Sync2Service)
+    import win32serviceutil
+    win32serviceutil.HandleCommandLine(Sync2Service)

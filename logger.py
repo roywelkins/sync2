@@ -8,12 +8,15 @@ class Logger:
         fullpath = os.path.join(dir, filepath)
         self.file = open(fullpath, 'a')
         self.file.write('\n'+ time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())+'\n')
+        self.file.flush()
+        
 
     def __del__(self):
         self.file.close()
         
     def write(self, msg):
         self.file.write(str(msg)+'\n')
+        self.file.flush()
         print msg
         
 if __name__=='__main__':

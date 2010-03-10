@@ -17,15 +17,21 @@ class PyWinService(win32serviceutil.ServiceFramework):
     _svc_name_ = None
     _svc_display_name_ = None
     _svc_description_ = None
+    logfile = 'd:\sync2\servicelog.txt'
     
     def __init__(self, args):
-        win32serviceutil.ServiceFramework.__init__(self, args)
-        self.log('init')
+        win32serviceutil.ServiceFramework.__init__(self, args)        
+        #if not os.path.isdir(os.path.dirname(logfile)):
+        #    os.makedirs(os.path.dirname(logfile))
+        #self.f = open(logfile)
+        #self.log('init')
         self.hWaitStop = win32event.CreateEvent(None, 0, 0, None)
+
         
     def log(self, msg):
-        """log msg into windows log"""
-        servicemanager.LogInfoMsg(str(msg))
+        pass
+    #    """log msg into windows log"""
+    #    self.f.write(msg)        
     
     def sleep(self, sec):
         """sleep sec seconds"""
@@ -33,23 +39,25 @@ class PyWinService(win32serviceutil.ServiceFramework):
         pass
        
     def SvcDoRun(self):
-        self.ReportServiceStatus(win32service.SERVICE_START_PENDING)
-        try:
-            self.ReportServiceStatus(win32service.SERVICE_RUNNING)
-            self.log('start')
-            self.start()
-            self.log('wait')
-            win32event.WaitForSingleObject(self.hWaitStop, win32event.INFINITE)
-            self.log('done')
-        except Exception, x:
-            self.log('Exception: %s' % x)
-            self.SvcStop()
+        win32event.WaitForSingleObject(self.hWaitStop, win32event.INFINITE) 
+        #self.ReportServiceStatus(win32service.SERVICE_START_PENDING)
+        #try:
+        #    self.ReportServiceStatus(win32service.SERVICE_RUNNING)
+        #    self.log('start')
+        #    #self.start()
+        #    self.log('wait')
+        #    win32event.WaitForSingleObject(self.hWaitStop, win32event.INFINITE)
+        #    self.log('done')
+        #except Exception, x:
+        #    self.log('Exception: %s' % x)
+        #    self.SvcStop()
        
     def SvcStop(self):
         self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
         self.log('stopping')
-        self.stop()
+        #self.stop()
         self.log('stopped')
+        #self.f.close()
         win32event.SetEvent(self.hWaitStop)
         self.ReportServiceStatus(win32service.SERVICE_STOPPED)
         
@@ -93,4 +101,3 @@ def installAndStartService(cls):
         print "service started"
     except Exception, e:
         print ('failed: Exception: %s ' % e)
-        

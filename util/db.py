@@ -14,7 +14,7 @@ cur.execute('insert into card_info (card_no,student_id) select card_no,student_i
 cur.execute('update card_info set person_id = (select person_id from person_info where person_info.student_id=card_info.student_id)')
 cur.execute('update card_info set person_uuid = (select uuid from person_info where person_info.student_id=card_info.student_id)')
 cur.execute('delete from card_info where card_no like "%.0"')
-cur.execute('delete from card_info where person_id is null')
+#cur.execute('delete from card_info where person_id is null')
 cur.execute('commit')
 
 #class
