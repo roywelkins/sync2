@@ -70,8 +70,12 @@ class Sync2:
             datas = self.db.getDatas(table, "sync=0")
             if not datas:
                 return
+            total = len(datas)
+            i = 1
             for data in datas:
                 try:
+                    print '\r', i,'/',total
+                    i = i+1
                     self.uploadData(table,data)
                 except Exception, e:
                     self.log.write(e)

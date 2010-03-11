@@ -15,3 +15,5 @@ mysql_options['host'] = m.find('host').text
 mysql_options['user'] = m.find('user').text
 mysql_options['passwd'] = m.find('passwd').text
 mysql_options['schema'] = m.find('schema').text
+
+from baseconf import serverplugins

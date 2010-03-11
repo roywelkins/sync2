@@ -122,8 +122,8 @@ class Db:
             else:
                 new[item[0]] = unicode(item[1])            
             if item[0]=='file':
-                new[item[0]] = new[item[0]].replace('\\', '\\\\')
-                
+                new[item[0]] = new[item[0]].replace('\\', '\\\\')                
+        sql = 'insert into %s (%s) values ("%s")' % (table, ','.join(new.keys()), '","'.join(new.values()))
         self.executeSQL(sql.encode('utf8'))
             
     def keyAlreadyExists(self, table, key):

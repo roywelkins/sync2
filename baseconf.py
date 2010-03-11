@@ -25,6 +25,7 @@ server_upload_tables = (
     'class',
     'template',
     'person_info',
+    'person_extra',
 )
 
 tables_with_file = (
@@ -45,6 +46,7 @@ keys = {
 
 field_exclude = {
     'person_info':('person_id', 'password'), #没有处理这个会有潜在的bug风险
+    #'person_extra':('person_id'),
     'card_info':('person_id','person_uuid'),
     'class':('person_id','class_id'),
     'sample':('person_id','class_id', 'sample_id'),
@@ -59,4 +61,9 @@ plugins = {
     'class':plugin.ClassPlugin,
     'sample':plugin.SamplePlugin,
     'template':plugin.TemplatePlugin,
+}
+
+import serverplugin
+serverplugins = {
+    'person_extra':serverplugin.PersonExtraPlugin,
 }
