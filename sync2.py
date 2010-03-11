@@ -175,6 +175,17 @@ class Sync2:
 if __name__=='__main__':
     while(True):
         try:
+            import conf
+            if conf.do_backup:
+                if not os.path.isdir('mysqlbackup'):
+                    os.mkdir('mysqlbackup')
+                cmd = 'mysqldump -u%s -p%s --host=%s --port=3306 %s > %s' \
+                          % (conf.mysql_options['user'], \
+                            conf.mysql_options['passwd'], \
+                            conf.mysql_options['host'], \
+                            conf.mysql_options['schema'], \
+                            os.path.join('mysqlbackup', time.strftime('%Y%m%d%H%M%S', time.localtime())+'.sql'))
+                os.system(cmd)
             #sleep(conf.sync_internal*1000/2)
             s = Sync2()
             #s.uploadTable('person_info')

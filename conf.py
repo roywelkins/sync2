@@ -3,13 +3,22 @@
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 
+
+
 root = ElementTree.parse('conf.xml').getroot()
+
+do_backup = root.find('do_backup').text
+if do_backup=='False':
+    do_backup = False
+else:
+    do_backup = True
 
 is_register_server = root.find('is_register_server').text
 if is_register_server=='False':
     is_register_server = False
 else:
     is_register_server = True
+    
 
 sync_internal = root.find('sync_internal').text
 web_service_url = root.find('web_service_url').text

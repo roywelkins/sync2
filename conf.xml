@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <conf>
+    <do_backup>True</do_backup>
     <is_register_server>False</is_register_server>
     <sync_internal>1200</sync_internal>
     <!--<web_service_url>http://localhost:7789/Sync2WebServicewsdl</web_service_url>-->

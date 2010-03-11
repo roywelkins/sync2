@@ -11,3 +11,4 @@ dist_client/
 dist_server/
 sync2error.txt
 util/output.txt
+mysqlbackup/
