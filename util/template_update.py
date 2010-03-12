@@ -44,7 +44,7 @@ for old_template in templates:
     cmd = 'Enroll.exe %s %s a output.txt' % (samplepath, newpath)
     os.system(cmd)
     sql = 'insert into template (uuid, person_id, person_uuid, class_id, class_uuid, sample_id, sample_uuid, database_id, algorithm_id, modify_time, file, valid, sync) values\
-                   ("%s", %s, "%s", %s, "%s", %d, "%s", 1016, 2, "%s", "%s", %s, "%s")' %\
+                   ("%s", %s, "%s", %s, "%s", %d, "%s", 1017, 2, "%s", "%s", %s, "%s")' %\
                    (uuid.uuid1(), old_template['person_id'], old_template['person_uuid'], old_template['class_id'], old_template['class_uuid'], old_template['sample_id'], old_template['sample_uuid'], time.strftime('%Y-%m-%d %H:%M:%S', gentime), newfile, old_template['valid'], time.strftime('%Y-%m-%d %H:%M:%S', gentime))
     cursor.execute(sql)
     cursor.execute('update template set valid = 0 where template_id = %s' % old_template['template_id'])

@@ -51,8 +51,7 @@ field_exclude = {
     'class':('person_id','class_id'),
     'sample':('person_id','class_id', 'sample_id'),
     'template':('person_id','class_id', 'sample_id', 'template_id'),
-    'result_info':('person_id',),
-    'record':('person_id','class_id','sample_id','record_id'),
+    'record':('person_id','class_id','sample_id','record_id', 'template_id'),
 }
 
 import plugin
@@ -61,9 +60,12 @@ plugins = {
     'class':plugin.ClassPlugin,
     'sample':plugin.SamplePlugin,
     'template':plugin.TemplatePlugin,
+    'person_extra':plugin.PersonExtraPlugin,
+    'result_info':plugin.ResultInfoPlugin,
 }
 
 import serverplugin
 serverplugins = {
     'person_extra':serverplugin.PersonExtraPlugin,
+    'result_info':serverplugin.ResultInfoPlugin,
 }

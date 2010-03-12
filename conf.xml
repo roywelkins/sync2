@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <conf>
-    <do_backup>True</do_backup>
+    <do_backup>False</do_backup>
     <is_register_server>False</is_register_server>
     <sync_internal>1200</sync_internal>
     <!--<web_service_url>http://localhost:7789/Sync2WebServicewsdl</web_service_url>-->
-    <web_service_url>http://162.105.30.159:7789/Sync2WebServicewsdl</web_service_url>
-    <data_dir_root_windows>D:\\data\\</data_dir_root_windows>
-    <data_dir_root_linux>/d/data/</data_dir_root_linux>
+    <web_service_url>http://localhost:7789/Sync2WebServicewsdl</web_service_url>
+    <data_dir_root_windows>D:\\data_client\\</data_dir_root_windows>
+    <data_dir_root_linux>/d/data_client/</data_dir_root_linux>
     <mysql_options>
         <host>localhost</host>
         <user>root</user>
         <passwd>root</passwd>
-        <schema>bioverify_new</schema>
+        <schema>bioverify_new_client</schema>
     </mysql_options>
     <logdir>logs</logdir>
 </conf>

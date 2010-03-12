@@ -26,7 +26,7 @@ class Sync2:
             self.service = soaplib.client.make_service_client(conf.web_service_url, Sync2WebService())
             #self.service = Sync2WebService()
             self.log.write('checking connection with url: ' + conf.web_service_url)
-            self.service.test_connection('aa')
+            self.service.test_connection('connected')
             self.next_sync_time = self.service.getCurrentTime()
             self.log.write('server connected: ' + self.next_sync_time)
         except socket.error, e:
@@ -62,24 +62,24 @@ class Sync2:
     def uploadTable(self, table):
         try:
             self.log.write('upload: %s' % (table,))
-            try:
-                plug = conf.plugins[table](self.db)
-            except exceptions.KeyError, e:
-                plug = plugin.PluginAbstract()
+            plug = self.getPlugin(table)
             plug.preUpload()
-            datas = self.db.getDatas(table, "sync=0")
+            datas = self.db.getDatas(table, 'sync=0 and "%s" is not null' % conf.keys[table])
             if not datas:
                 return
             total = len(datas)
             i = 1
             for data in datas:
                 try:
-                    print '\r', i,'/',total
+                    print '\r', i,'/',total,
                     i = i+1
+                    data = plug.preUploadData(data)
                     self.uploadData(table,data)
+                    data = plug.postUploadData(data)
                 except Exception, e:
                     self.log.write(e)
                     raise
+            print
             plug.postUpload()
         except Exception, e:
             self.log.write(e)
@@ -95,7 +95,7 @@ class Sync2:
         # data
         root = self.xmlmgr.dictToXML(datadict, head='root')
         xmlstring = ElementTree.tostring(root, encoding='utf8')
-        
+                
         synctime = self.service.upload(xmlstring)
         
         if table in conf.tables_with_file:
@@ -107,16 +107,17 @@ class Sync2:
     def downloadTable(self, table):
         try:
             self.log.write('download: %s' % (table,))
-            try:
-                plug = conf.plugins[table](self.db)
-            except exceptions.KeyError, e:
-                plug = plugin.PluginAbstract()
+            plug = self.getPlugin(table)
             plug.preDownload()
             keytosync = self.service.getKeysToSync(table, self.last_sync_time, self.next_sync_time)
             if not keytosync:
                 return
             keys = keytosync.split(',')
+            total = len(keys)
+            i = 1
             for key in keys:
+                print '\r', i, '/', total,
+                i = i+1
                 xmlstring = self.downloadData(table, key)
                 if not xmlstring:
                     continue
@@ -125,14 +126,24 @@ class Sync2:
                 if self.db.alreadyUpToDate(table, data):
                     continue
                 else:
+                    data = plug.preDownloadData(data)
                     self.db.updateData(table, data)
+                    data = plug.postDownloadData(data)
                 
                 if table in conf.tables_with_file:
-                    self.downloadFile(data['file'])            
+                    self.downloadFile(data['file'])
+            print
             plug.postDownload()
         except Exception, e:
             self.log.write(e)
             raise
+        
+    def getPlugin(self, table):
+        try:
+            plug = conf.plugins[table](self.db)
+        except exceptions.KeyError, e:
+            plug = plugin.PluginAbstract()
+        return plug
             
     def downloadData(self, table, key):
         """download a data from the web service"""
@@ -175,27 +186,30 @@ class Sync2:
             self.log.write(e)
             raise
 
+def dobackup():
+    import conf
+    if not os.path.isdir('mysqlbackup'):
+        os.mkdir('mysqlbackup')
+    cmd = 'mysqldump -u%s -p%s --host=%s --port=3306 %s > %s' \
+              % (conf.mysql_options['user'], \
+                conf.mysql_options['passwd'], \
+                conf.mysql_options['host'], \
+                conf.mysql_options['schema'], \
+                os.path.join('mysqlbackup', time.strftime('%Y%m%d%H%M%S', time.localtime())+'.sql'))
+    os.system(cmd)
     
 if __name__=='__main__':
     while(True):
         try:
             import conf
             if conf.do_backup:
-                if not os.path.isdir('mysqlbackup'):
-                    os.mkdir('mysqlbackup')
-                cmd = 'mysqldump -u%s -p%s --host=%s --port=3306 %s > %s' \
-                          % (conf.mysql_options['user'], \
-                            conf.mysql_options['passwd'], \
-                            conf.mysql_options['host'], \
-                            conf.mysql_options['schema'], \
-                            os.path.join('mysqlbackup', time.strftime('%Y%m%d%H%M%S', time.localtime())+'.sql'))
-                os.system(cmd)
-            #sleep(conf.sync_internal*1000/2)
+                dobackup()
             s = Sync2()
-            #s.uploadTable('person_info')
-            #s.downloadTable('person_info')    
             s.syncAll()
-            sleep(conf.sync_internal*1000/2)
+            print '========================================================'
+            time.sleep(float(conf.sync_internal))
         except Exception, e:
-            f = open('sync2error.txt', 'a')
+            print e
+            f = open('sync2error.txt', 'a')            
             print >> f, e
+            f.close()

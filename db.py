@@ -4,6 +4,7 @@
 import MySQLdb
 import MySQLdb.cursors
 import baseconf as conf
+import datetime
 
 class Db:
     """comunicate with the sql server"""
@@ -15,7 +16,7 @@ class Db:
         cursor.execute('set names utf8')
         cursor.close()
         self.log = None
-        self.database_id = 1016
+        self.database_id = 1017
         
     def getLastSyncTime(self):
         cursor = self.db_conn.cursor()
@@ -29,15 +30,11 @@ class Db:
         t = t['last_sync']
         if t==None:
             # this is the first time of running sync2
-            import datetime
-            t = datetime.datetime(2000,01,01,01,01,01)
+            t = datetime.datetime(2010,03,11,00,00,00)
         return t.__str__()
         
     def setLastSyncTime(self, synctime):
-        cursor = self.db_conn.cursor()
-        cursor.execute('update database_info set last_sync="%s" where database_id = %d' % (synctime, self.database_id))
-        cursor.execute('commit')
-        cursor.close()
+        self.executeSQL('update database_info set last_sync="%s" where database_id = %d' % (synctime, self.database_id))
     
     def getKeysInTableWithSyncBetween(self, table, lasttime, nexttime):
         """as the name says
@@ -46,7 +43,7 @@ class Db:
         """
         cursor = self.db_conn.cursor()
         #cursor.execute('start transaction')
-        sql = 'select %s from %s where sync between "%s" and "%s" limit 500' % (conf.keys[table], table, lasttime, nexttime)
+        sql = 'select %s from %s where sync between "%s" and "%s"' % (conf.keys[table], table, lasttime, nexttime)
         cursor.execute(sql)
         results = cursor.fetchall()
         cursor.execute('commit')
@@ -67,7 +64,20 @@ class Db:
         cursor.execute('commit')
         cursor.close()
         return result
-        
+    
+    def getData(self, table, where=None):
+        """return a dict of the table having the where condition"""
+        cursor = self.db_conn.cursor()
+        #cursor.execute('start transaction')
+        sql = 'select * from '+table
+        if where:
+            sql = sql + ' where '+where
+        cursor.execute(sql)
+        result = cursor.fetchone()
+        cursor.execute('commit')
+        cursor.close()
+        return result
+    
     def setAsSynced(self, table, key, value, synctime):
         """set a record as synced at synctime where having key=value(such as uuid=xxxxxxxx)"""
         sql = "update %s set sync = '%s' where %s = '%s'" % (table, synctime, key, value)
@@ -95,7 +105,9 @@ class Db:
         if the key of data already exists, delete the old data and insert the new one
         """
         #好像有潜在的造成某一行锁住，所有操作都不能提交的可能
-        key = data[conf.keys[table]]        
+        key = data[conf.keys[table]]
+        if self.isNull(key):
+            return
         if self.keyAlreadyExists(table, key):
             self.deleteData(table, key)
         self.insertData(table, data)
@@ -114,7 +126,7 @@ class Db:
         for item in data.items():
             if table in conf.field_exclude.keys() and item[0] in conf.field_exclude[table]:
                 pass
-            elif item[1]=='None' or item[1]==None or item[1]=='NULL' or item[1]=='null':
+            elif self.isNull(item[1]):
                 pass
                 #new[item[0]] = 'NULL'
             elif type(item[1])==str:
@@ -144,8 +156,8 @@ class Db:
         cursor = self.db_conn.cursor()
         cursor.execute('select person_id,date(time),count(*) from record where result=22 group by person_id,date(time) having count(*)>1')
         records = cursor.fetchall()
-        cursor.close()
         cursor.execute('commit')
+        cursor.close()
         for record in records:
             self.executeSQL('update record set result = 5 where person_id = "%s" and date(time) = "%s" order by time desc limit %d' % (record['person_id'], record['date(time)'], record['count(*)']-1))
         
@@ -181,6 +193,9 @@ class Db:
         cursor.execute('commit')
         cursor.close()
         return result
+    
+    def isNull(self, obj):
+        return obj=='None' or obj==None or obj=='NULL' or obj=='null'
             
             
 if __name__=='__main__':

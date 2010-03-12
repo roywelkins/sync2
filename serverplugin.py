@@ -22,11 +22,19 @@ class ServerPluginAbstract:
     
 class PersonExtraPlugin(ServerPluginAbstract):
     def preUploadData(self, data):
-        print data['person_uuid']
         r = self.db.getOneResult('select person_id from person_info where uuid = "%s"' % data['person_uuid'])
         if not r:
+            data['person_id'] = None
             return data
-        print data['person_id']
+        data['person_id'] = r['person_id']
+        return data
+    
+class ResultInfoPlugin(ServerPluginAbstract):
+    def preUploadData(self, data):
+        r = self.db.getOneResult('select person_id from person_info where uuid = "%s"' % data['person_uuid'])
+        if not r:
+            data['person_id'] = None
+            return data
         data['person_id'] = r['person_id']
         return data
         
