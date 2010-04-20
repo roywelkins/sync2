@@ -17,6 +17,9 @@ import xmlmgr
 from sync2webservice import Sync2WebService
 import logger
 import exceptions
+import util
+from util.getip import get_ip_address
+import os
 
 class Sync2: 
     def __init__(self):
@@ -26,7 +29,7 @@ class Sync2:
             self.service = soaplib.client.make_service_client(conf.web_service_url, Sync2WebService())
             #self.service = Sync2WebService()
             self.log.write('checking connection with url: ' + conf.web_service_url)
-            self.service.test_connection('connected')
+            self.service.test_connection(os.getenv('computername') + ' ' + get_ip_address())
             self.next_sync_time = self.service.getCurrentTime()
             self.log.write('server connected: ' + self.next_sync_time)
         except socket.error, e:
@@ -42,15 +45,18 @@ class Sync2:
             raise
         
     def syncAll(self):
+        self.service.fixAll()
+        return
+        
         if conf.is_register_server:
-            upload_tables = conf.common_upload_tables + conf.server_upload_tables
+            upload_tables = conf.server_upload_tables + conf.common_upload_tables
         else:
             upload_tables = conf.common_upload_tables
         for table in upload_tables:
             self.uploadTable(table)
             
         if conf.is_register_server:
-            download_tables = conf.common_download_tables + conf.server_download_tables
+            download_tables = conf.server_download_tables + conf.common_download_tables
         else:
             download_tables = conf.common_download_tables
         for table in download_tables:
@@ -78,7 +84,7 @@ class Sync2:
                     data = plug.postUploadData(data)
                 except Exception, e:
                     self.log.write(e)
-                    raise
+                    #raise
             print
             plug.postUpload()
         except Exception, e:
@@ -116,22 +122,29 @@ class Sync2:
             total = len(keys)
             i = 1
             for key in keys:
-                print '\r', i, '/', total,
-                i = i+1
-                xmlstring = self.downloadData(table, key)
-                if not xmlstring:
-                    continue
-                data = self.xmlmgr.XMLToDict(xmlstring)
-                data = data['data']
-                if self.db.alreadyUpToDate(table, data):
-                    continue
-                else:
-                    data = plug.preDownloadData(data)
-                    self.db.updateData(table, data)
-                    data = plug.postDownloadData(data)
-                
-                if table in conf.tables_with_file:
-                    self.downloadFile(data['file'])
+                try:
+                    print '\r', i, '/', total,
+                    i = i + 1
+                    xmlstring = self.downloadData(table, key)
+                    if not xmlstring:
+                        continue
+                    data = self.xmlmgr.XMLToDict(xmlstring)
+                    data = data['data']
+                    if self.db.alreadyUpToDate(table, data):
+                        continue
+                    else:
+                        data = plug.preDownloadData(data)
+                        self.db.updateData(table, data)
+                        data = plug.postDownloadData(data)
+                    
+                    if table in conf.tables_with_file:
+                        self.downloadFile(data['file'])
+                except Exception,e:
+                    self.log.write(table+' '+key)
+                    self.log.write(e)
+                    keys.append(key)
+                    time.sleep(float(5))
+                    i = i - 1
             print
             plug.postDownload()
         except Exception, e:
@@ -199,10 +212,16 @@ def dobackup():
     os.system(cmd)
     
 if __name__=='__main__':
+    #s = Sync2()
+    #s.uploadTable('record')
+    #exit()
+    i = 100
     while(True):
         try:
+            i = i + 1
             import conf
-            if conf.do_backup:
+            if conf.do_backup and i > 10:
+                i = 0
                 dobackup()
             s = Sync2()
             s.syncAll()
@@ -213,3 +232,4 @@ if __name__=='__main__':
             f = open('sync2error.txt', 'a')            
             print >> f, e
             f.close()
+            time.sleep(float(conf.sync_internal))

@@ -8,7 +8,6 @@ from soaplib.serializers.binary import Attachment
 
 import os
 import time
-import serverconf
 import baseconf
 import logger
 import xmlmgr
@@ -16,22 +15,23 @@ import db
 import exceptions
 from xml.etree import cElementTree as ElementTree
 
-class Sync2WebService(SimpleWSGISoapApp):
-    
-    log = logger.Logger('logs', 'sync2service.log.'+time.strftime('%Y%m%d', time.localtime())+'.txt')
+class Sync2WebService(SimpleWSGISoapApp):    
     
     def getNewDb(self):
+        import serverconf
         d = db.Db(serverconf.mysql_options)        
-        d.log = Sync2WebService.log
+        d.log = self.log
         return d
     
     def __init__(self):
         SimpleWSGISoapApp.__init__(self)
         self.xmlmgr = xmlmgr.XMLManager()
-        self.log = Sync2WebService.log
+        self.log = None
 
     @soapmethod(String)
     def test_connection(self, msg):
+        if not self.log:
+            self.log = logger.Logger('logs', 'sync2service.log.'+time.strftime('%Y%m%d', time.localtime())+'.txt')        
         self.log.write(msg)
 
     @soapmethod(_returns=String)
@@ -60,6 +60,7 @@ class Sync2WebService(SimpleWSGISoapApp):
                 filepath = filepath.replace('\\', '/')
             else:
                 filepath = filepath.replace('/', '\\')
+            import serverconf
             fullpath = os.path.join(serverconf.data_dir_root, filepath)
             if not os.path.isdir(os.path.dirname(fullpath)):
                 os.makedirs(os.path.dirname(fullpath))
@@ -77,6 +78,7 @@ class Sync2WebService(SimpleWSGISoapApp):
                 filepath = filepath.replace('\\', '/')
             else:
                 filepath = filepath.replace('/', '\\')
+            import serverconf
             fullpath = os.path.join(serverconf.data_dir_root, filepath)
             f = open(fullpath, 'rb')
             data = f.read()
@@ -106,8 +108,9 @@ class Sync2WebService(SimpleWSGISoapApp):
         data = plug.postUploadData(data)
         return data['sync']
         
-    def getServerPlugin(self, table):
+    def getServerPlugin(self, table):        
         try:
+            import serverconf
             plug = serverconf.serverplugins[table](self.getNewDb())
         except exceptions.KeyError, e:
             import serverplugin
@@ -148,11 +151,11 @@ class Sync2WebService(SimpleWSGISoapApp):
         d.executeSQL('update template set class_id = (select class_id from class where class.uuid = template.class_uuid) where class_id is null and class_uuid is not null')
         d.executeSQL('update template set sample_id = (select sample_id from sample where sample.uuid = template.sample_uuid) where sample_id is null and sample_uuid is not null')
         #record
-        #d.executeSQL('update record set person_id = (select person_id from person_info where person_info.uuid = record.person_uuid) where person_id is null and person_uuid is not null')
+        d.executeSQL('update record set person_id = (select person_id from person_info where person_info.uuid = record.person_uuid) where person_id is null and person_uuid is not null')
         d.executeSQL('update record set template_id = (select template_id from template where template.uuid = record.template_uuid) where template_id is null and template_uuid is not null')
         d.executeSQL('update record set sample_id = (select sample_id from sample where sample.uuid = record.sample_uuid) where sample_id is null and sample_uuid is not null')
         
-        d.recordDeduplicate()
+        #d.recordDeduplicate()
         d.genResult()
         
 
@@ -161,15 +164,15 @@ if __name__=='__main__':
 #    s = Sync2WebService()
 #    s.putFile('/tmp/1/2', None)
 #    exit()
-#    s = Sync2WebService()
-#    s.fixAll()
-#    exit()
+    #s = Sync2WebService()
+    #s.fixAll()
+    #exit()
     try:
         #from wsgiref.simple_server import make_server
         #server = make_server('0.0.0.0',7789,Sync2WebService())
         #server.serve_forever()
         
-        from cherrypy.wsgiserver import CherryPyWSGIServer
+        from cherrypy.wsgiserver import CherryPyWSGIServer        
         server = CherryPyWSGIServer(('0.0.0.0',7789),Sync2WebService())
         server.start()
     except KeyboardInterrupt, e:

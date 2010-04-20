@@ -34,7 +34,8 @@ for line in data[1:-1]:
     else:
         gender = 'F'
     person = d.getOneResult('select * from person_info where student_id = "%s"' % s_id)
-    d.executeSQL(('update person_info set sex="%s",department_no="%s",name="%s" where person_id = "%s"' % (gender,dept_id,person['person_id'], s_name)).encode('utf8'))
+    d.executeSQL(('update person_info set sex="%s",department_no="%s",name="%s" where person_id = "%s"' % (gender,dept_id,s_name,person['person_id'])).encode('utf8'))
+    continue
     #teacher_info
     teacher = d.getOneResult('select * from teacher_info where teacher_id = "%s"' % t_id)
     if not teacher:

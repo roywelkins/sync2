@@ -15,7 +15,8 @@ class Logger:
         self.file.close()
         
     def write(self, msg):
-        self.file.write(str(msg)+'\n')
+        msg = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()) + '\t' + str(msg)
+        self.file.write(msg+'\n')
         self.file.flush()
         print msg
         

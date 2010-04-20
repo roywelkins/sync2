@@ -95,7 +95,7 @@ class Db:
         if not d:
             return False
         sync = d['sync'].__str__()
-        if sync==data['sync']:
+        if sync==data['sync'] or sync == 'None':
             return True
         return False
 
@@ -159,14 +159,19 @@ class Db:
         cursor.execute('commit')
         cursor.close()
         for record in records:
-            self.executeSQL('update record set result = 5 where person_id = "%s" and date(time) = "%s" order by time desc limit %d' % (record['person_id'], record['date(time)'], record['count(*)']-1))
+            sql = 'update record set result = 5 where person_id = "%s" and date(time) = "%s" and result = 22 order by time desc limit %d' % (record['person_id'], record['date(time)'], record['count(*)']-1)
+            self.executeSQL(sql)
         
     def genResult(self):
         # 这不靠谱，太慢，要改成插件形式
         self.executeSQL('insert into result_info (person_id,person_uuid,sync) select person_id,person_uuid,current_timestamp from person_extra where registered = 1 and person_id not in (select distinct(person_id) from result_info)')
-        self.executeSQL('update result_info set total_mor = (select count(*) from record where person_id=result_info.person_id and result=21)')
-        self.executeSQL('update result_info set total_eve = (select count(*) from record where person_id=result_info.person_id and result=22)')
-        
+        #self.executeSQL('update result_info set sync=current_timestamp, total_mor = (select count(*) from record where person_id=result_info.person_id and result=21)')
+        #self.executeSQL('update result_info set sync=current_timestamp, total_eve = (select count(*) from record where person_id=result_info.person_id and result=22)')
+    
+    def genOneResult(self, person_id, person_uuid):
+        result = self.getOneResult('select * from result_info where person_id = "%s"' % person_id)
+        if not result:
+            self.executeSQL('insert into result_info (person_id, person_uuid, sync) values ("%s", "%s", current_timestamp)' % (person_id, person_uuid))        
         
     def executeSQL(self, sql):
         cursor = self.db_conn.cursor()

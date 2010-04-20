@@ -28,6 +28,9 @@ class PersonExtraPlugin(ServerPluginAbstract):
             return data
         data['person_id'] = r['person_id']
         return data
+    def postUploadData(self, data):
+        self.db.genOneResult(data['person_id'], data['person_uuid'])
+        return data
     
 class ResultInfoPlugin(ServerPluginAbstract):
     def preUploadData(self, data):
@@ -38,3 +41,16 @@ class ResultInfoPlugin(ServerPluginAbstract):
         data['person_id'] = r['person_id']
         return data
         
+class RecordPlugin(ServerPluginAbstract):
+    def preUploadData(self, data):
+        if (data['result'] == '22'):
+            r = self.db.getOneResult('select * from record where person_uuid = "%s" and date(time) = date("%s") and result = 22' % (data['person_uuid'], data['time']))
+            if r:
+                data['result'] = 5
+        return data
+    def postUploadData(self, data):
+        if (data['result'] == '21'):
+            self.db.executeSQL('update result_info set sync=current_timestamp, total_mor=total_mor+1 where person_uuid = "%s"' % data['person_uuid'])
+        elif (data['result'] == '22'):
+            self.db.executeSQL('update result_info set sync=current_timestamp, total_eve=total_eve+1 where person_uuid = "%s"' % data['person_uuid'])
+        return data

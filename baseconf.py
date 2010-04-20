@@ -4,12 +4,12 @@
 # 以下部分为程序内部逻辑配置，请勿修改
 # 无论注册机还是非注册机都要下载的表
 common_download_tables = (
-    'card_info',
-    'class',
     'result_info',
+    'card_info',
+    'person_info',    
+    'class',
     'template',
-    'person_info',
-    'person_extra',
+    'person_extra',               
 )
 # 无论注册机还是非注册机都要上传的表
 common_upload_tables = (
@@ -68,4 +68,5 @@ import serverplugin
 serverplugins = {
     'person_extra':serverplugin.PersonExtraPlugin,
     'result_info':serverplugin.ResultInfoPlugin,
+    'record':serverplugin.RecordPlugin,
 }
