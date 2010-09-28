@@ -460,6 +460,30 @@
 </preference-set>
   <string id="lastInvocation">default</string>
 </preference-set>
+<preference-set idref="18a2186f-d6f2-4428-8512-4470f3ec2dc1/util_dbsplit/split.py">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <string id="documentRoot"></string>
+  <string id="executable-params"></string>
+  <string relative="path" id="filename">util_dbsplit/split.py</string>
+  <string id="getparams"></string>
+  <string id="language">Python</string>
+  <string id="mpostparams"></string>
+  <string id="params">localhost root root bioverify_2009_summer d:\\Bioverify\\Database d:\\Bioverify\\Database_2009_summer</string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">1</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
 <preference-set idref="18a2186f-d6f2-4428-8512-4470f3ec2dc1/xmlmgr.py">
 <preference-set id="Invocations">
 <preference-set id="default">
@@ -676,6 +700,30 @@
 </preference-set>
   <string id="lastInvocation">default</string>
 </preference-set>
+<preference-set idref="523c3a66-1d4b-40bf-ab30-d70d0ae8895c">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <string id="documentRoot"></string>
+  <string id="executable-params"></string>
+  <string relative="path" id="filename">util_dbsplit/split.py</string>
+  <string id="getparams"></string>
+  <string id="language">Python</string>
+  <string id="mpostparams"></string>
+  <string id="params">localhost root root bioverify_2009_spring d:\\Bioverify\\Database d:\\Bioverify\\Database_2009_spring</string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">1</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
 <preference-set idref="5f0dafe2-de41-4d82-991c-b790b329c253">
 <preference-set id="Invocations">
 <preference-set id="default">
@@ -742,6 +790,30 @@
   <boolean id="show-dialog">1</boolean>
   <boolean id="sim-cgi">0</boolean>
   <boolean id="use-console">0</boolean>
+  <string id="userCGIEnvironment"></string>
+  <string id="userEnvironment"></string>
+</preference-set>
+</preference-set>
+  <string id="lastInvocation">default</string>
+</preference-set>
+<preference-set idref="73892d9a-1b6d-4b3a-81f3-7dc714ec9e73">
+<preference-set id="Invocations">
+<preference-set id="default">
+  <string id="cookieparams"></string>
+  <string id="cwd"></string>
+  <string id="documentRoot"></string>
+  <string id="executable-params"></string>
+  <string relative="path" id="filename">util_dbsplit/split.py</string>
+  <string id="getparams"></string>
+  <string id="language">Python</string>
+  <string id="mpostparams"></string>
+  <string id="params">localhost root root bioverify_2009_spring d:\\Bioverify\\Database d:\\Bioverify\\Database_2009_spring</string>
+  <string id="postparams"></string>
+  <string id="posttype">application/x-www-form-urlencoded</string>
+  <string id="request-method">GET</string>
+  <boolean id="show-dialog">1</boolean>
+  <boolean id="sim-cgi">0</boolean>
+  <boolean id="use-console">1</boolean>
   <string id="userCGIEnvironment"></string>
   <string id="userEnvironment"></string>
 </preference-set>
