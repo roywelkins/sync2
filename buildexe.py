@@ -37,6 +37,6 @@ opts_server = {
 }
 
 #setup(console=['sync2.py'], options=opts, zipfile="sync2.lib", data_files=datafiles)
-#setup(console=['sync2webservice.py'], options=opts_server, zipfile="sync2webservice.lib", data_files=datafiles_server)
+setup(console=['sync2webservice.py'], options=opts_server, zipfile="sync2webservice.lib", data_files=datafiles_server)
 
-setup(console=['upload_card_info.py'], options=opts, zipfile="sync2.lib", data_files=datafiles)
+#setup(console=['upload_card_info.py'], options=opts, zipfile="sync2.lib", data_files=datafiles)

@@ -44,7 +44,7 @@ class ResultInfoPlugin(ServerPluginAbstract):
 class RecordPlugin(ServerPluginAbstract):
     def preUploadData(self, data):
         if (data['result'] == '22'):
-            r = self.db.getOneResult('select * from record where person_uuid = "%s" and date(time) = date("%s") and result = 22' % (data['person_uuid'], data['time']))
+            r = self.db.getOneResult('select * from record where person_uuid = "%s" and date(time) = date("%s") and result = 22 and uuid!="%s"' % (data['person_uuid'], data['time'], data['uuid']))
             if r:
                 data['result'] = 5
         return data
