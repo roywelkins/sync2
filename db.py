@@ -164,14 +164,14 @@ class Db:
         
     def genResult(self):
         # 这不靠谱，太慢，要改成插件形式
-        self.executeSQL('insert into result_info (person_id,person_uuid,sync) select person_id,person_uuid,current_timestamp from person_extra where registered = 1 and person_id not in (select distinct(person_id) from result_info)')
+        self.executeSQL('insert into result_info (person_id,person_uuid,sync, extra_mor) select person_id,person_uuid,current_timestamp,1 from person_extra where registered = 1 and person_id not in (select distinct(person_id) from result_info)')
         #self.executeSQL('update result_info set sync=current_timestamp, total_mor = (select count(*) from record where person_id=result_info.person_id and result=21)')
         #self.executeSQL('update result_info set sync=current_timestamp, total_eve = (select count(*) from record where person_id=result_info.person_id and result=22)')
     
     def genOneResult(self, person_id, person_uuid):
         result = self.getOneResult('select * from result_info where person_id = "%s"' % person_id)
         if not result:
-            self.executeSQL('insert into result_info (person_id, person_uuid, sync) values ("%s", "%s", current_timestamp)' % (person_id, person_uuid))        
+            self.executeSQL('insert into result_info (person_id, person_uuid, sync, extra_mor) values ("%s", "%s", current_timestamp, 1)' % (person_id, person_uuid))        
         
     def executeSQL(self, sql):
         cursor = self.db_conn.cursor()
