@@ -211,10 +211,11 @@ def dobackup():
                 os.path.join('mysqlbackup', time.strftime('%Y%m%d%H%M%S', time.localtime())+'.sql'))
     os.system(cmd)
     
-if __name__=='__main__':
+if __name__=='__main__':    
     #s = Sync2()
     #s.uploadTable('record')
     #exit()
+
     i = 100
     while(True):
         try:

@@ -42,15 +42,20 @@ class ResultInfoPlugin(ServerPluginAbstract):
         return data
         
 class RecordPlugin(ServerPluginAbstract):
-    def preUploadData(self, data):
+    def preUploadData(self, data):        
         if (data['result'] == '22'):
             r = self.db.getOneResult('select * from record where person_uuid = "%s" and date(time) = date("%s") and result = 22 and uuid!="%s"' % (data['person_uuid'], data['time'], data['uuid']))
             if r:
                 data['result'] = 5
+        r2 = self.db.getOneResult('select * from record where uuid = "%s"' % data['uuid'])
+        self.reupload = False
+        if r2:
+            self.reupload = True
         return data
     def postUploadData(self, data):
-        if (data['result'] == '21'):
-            self.db.executeSQL('update result_info set sync=current_timestamp, total_mor=total_mor+1 where person_uuid = "%s"' % data['person_uuid'])
-        elif (data['result'] == '22'):
-            self.db.executeSQL('update result_info set sync=current_timestamp, total_eve=total_eve+1 where person_uuid = "%s"' % data['person_uuid'])
+        if not self.reupload:
+            if (data['result'] == '21'):
+                self.db.executeSQL('update result_info set sync=current_timestamp, total_mor=total_mor+1 where person_uuid = "%s"' % data['person_uuid'])
+            elif (data['result'] == '22'):
+                self.db.executeSQL('update result_info set sync=current_timestamp, total_eve=total_eve+1 where person_uuid = "%s"' % data['person_uuid'])
         return data
