@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 #coding:utf8
 
+###################################
+# file format
+#   card_no, name, student_id
+###################################
+
 import sys
 import os
 sys.path.append('../..')
@@ -23,12 +28,12 @@ d = db.Db({'user':'pe',\
 
 #files = ['07', '08', '09', '10', '09.TXT']
 #files = ['10000.TXT', '10103.TXT']
-files = ['aa.txt']
+files = ['1.txt']
 
 for filename in files:
-    filename = os.path.join('.', 'files', '2010autumn', filename)
+    filename = os.path.join('.', 'files', '2011spring', filename)
     f = open(filename, 'r')
-    data = f.read().decode('gbk')
+    data = f.read().decode('utf8')
     data = data.split('\n')
     for line in data[1:]:
         #print line
